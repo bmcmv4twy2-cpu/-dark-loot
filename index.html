@@ -1,0 +1,1407 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<title>DARK LOOT</title>
+
+<style>
+*{
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
+}
+
+body{
+  margin:0;
+  background:#08090d;
+  color:#eee;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  overflow:hidden;
+}
+
+button{
+  font:inherit;
+  border:0;
+}
+
+#game{
+  width:100vw;
+  height:100vh;
+  max-width:520px;
+  margin:auto;
+  position:relative;
+  overflow:hidden;
+  background:
+    radial-gradient(circle at 50% 30%,#252b3d 0%,#111520 35%,#07080c 100%);
+}
+
+/* ---------- TITLE ---------- */
+
+#titleScreen{
+  position:absolute;
+  inset:0;
+  z-index:20;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  background:
+    radial-gradient(circle at center,#252b3c 0%,#090a0e 65%);
+}
+
+.logo{
+  font-size:46px;
+  font-weight:900;
+  letter-spacing:5px;
+  color:#fff;
+  text-shadow:
+    0 0 10px #8d5cff,
+    0 0 30px #5b25b8;
+}
+
+.subtitle{
+  color:#9298aa;
+  letter-spacing:4px;
+  margin-top:8px;
+  margin-bottom:55px;
+}
+
+.startBtn{
+  width:240px;
+  padding:17px;
+  border-radius:12px;
+  background:linear-gradient(135deg,#7447ff,#3c20a0);
+  color:white;
+  font-weight:800;
+  font-size:18px;
+  box-shadow:0 8px 30px #000;
+}
+
+/* ---------- HUD ---------- */
+
+#gameScreen{
+  display:none;
+  position:absolute;
+  inset:0;
+}
+
+.topHud{
+  height:82px;
+  padding:12px;
+  background:rgba(5,6,10,.88);
+  border-bottom:1px solid #303442;
+}
+
+.playerRow{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.playerName{
+  font-weight:800;
+}
+
+.level{
+  color:#b28cff;
+  font-size:13px;
+}
+
+.bar{
+  height:9px;
+  background:#242630;
+  border-radius:20px;
+  overflow:hidden;
+  margin-top:7px;
+}
+
+.hp{
+  width:100%;
+  height:100%;
+  background:linear-gradient(90deg,#e33b54,#ff6c76);
+  transition:.25s;
+}
+
+.exp{
+  width:0%;
+  height:100%;
+  background:linear-gradient(90deg,#6848ff,#b68cff);
+  transition:.3s;
+}
+
+.stats{
+  display:flex;
+  justify-content:space-between;
+  margin-top:5px;
+  font-size:11px;
+  color:#999fb0;
+}
+
+/* ---------- DUNGEON ---------- */
+
+.dungeon{
+  position:absolute;
+  top:82px;
+  bottom:125px;
+  left:0;
+  right:0;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+}
+
+.floor{
+  position:absolute;
+  top:14px;
+  left:14px;
+  font-size:13px;
+  color:#9b9fac;
+}
+
+.floor span{
+  color:#c39bff;
+  font-weight:800;
+}
+
+.enemyArea{
+  width:100%;
+  text-align:center;
+}
+
+.enemyShadow{
+  width:150px;
+  height:35px;
+  margin:0 auto -15px;
+  background:rgba(0,0,0,.6);
+  border-radius:50%;
+  filter:blur(8px);
+}
+
+.enemy{
+  font-size:110px;
+  line-height:1;
+  filter:
+    drop-shadow(0 10px 12px #000)
+    drop-shadow(0 0 20px #842cff);
+  animation:float 2.2s ease-in-out infinite;
+}
+
+@keyframes float{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-8px)}
+}
+
+.enemyName{
+  margin-top:15px;
+  font-weight:900;
+  font-size:18px;
+}
+
+.enemyHp{
+  width:210px;
+  margin:10px auto;
+  height:10px;
+  background:#292a32;
+  border-radius:20px;
+  overflow:hidden;
+}
+
+.enemyHpInner{
+  width:100%;
+  height:100%;
+  background:linear-gradient(90deg,#ff3155,#ff8c66);
+  transition:.2s;
+}
+
+.enemyInfo{
+  color:#858a9b;
+  font-size:12px;
+}
+
+/* ---------- DAMAGE ---------- */
+
+.damage{
+  position:absolute;
+  left:50%;
+  top:35%;
+  transform:translateX(-50%);
+  font-size:34px;
+  font-weight:900;
+  color:#fff;
+  text-shadow:0 3px 5px #000;
+  pointer-events:none;
+  animation:damageAnim .8s forwards;
+  z-index:10;
+}
+
+.critical{
+  color:#ffd34e;
+  font-size:43px;
+}
+
+@keyframes damageAnim{
+  0%{opacity:0;transform:translate(-50%,20px) scale(.6)}
+  20%{opacity:1}
+  100%{opacity:0;transform:translate(-50%,-70px) scale(1.2)}
+}
+
+/* ---------- BOTTOM ---------- */
+
+.bottom{
+  position:absolute;
+  left:0;
+  right:0;
+  bottom:0;
+  height:125px;
+  background:rgba(7,8,12,.96);
+  border-top:1px solid #303442;
+  padding:10px;
+}
+
+.actions{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:8px;
+}
+
+.action{
+  height:56px;
+  border-radius:10px;
+  color:white;
+  background:linear-gradient(145deg,#292d3b,#161820);
+  border:1px solid #3a3e4d;
+  font-weight:800;
+}
+
+.attack{
+  background:linear-gradient(145deg,#8d35ff,#4b1e9f);
+  border-color:#a56aff;
+  box-shadow:0 0 18px rgba(119,53,255,.25);
+}
+
+.action:active{
+  transform:scale(.95);
+}
+
+.menu{
+  display:flex;
+  justify-content:space-around;
+  margin-top:9px;
+}
+
+.menu button{
+  color:#8d92a2;
+  background:none;
+  font-size:11px;
+}
+
+.menu button span{
+  display:block;
+  font-size:21px;
+  margin-bottom:2px;
+}
+
+/* ---------- LOOT ---------- */
+
+#lootModal,
+#inventoryModal,
+#gameOver{
+  display:none;
+  position:absolute;
+  inset:0;
+  z-index:30;
+  background:rgba(0,0,0,.82);
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+}
+
+.modal{
+  width:100%;
+  max-width:380px;
+  background:linear-gradient(160deg,#1d202c,#0e1016);
+  border:1px solid #424657;
+  border-radius:18px;
+  padding:22px;
+  box-shadow:0 20px 60px #000;
+  text-align:center;
+}
+
+.modalTitle{
+  font-size:23px;
+  font-weight:900;
+  margin-bottom:20px;
+}
+
+.item{
+  padding:18px;
+  border-radius:13px;
+  background:#11131b;
+  border:1px solid #333746;
+  margin-bottom:16px;
+}
+
+.itemIcon{
+  font-size:55px;
+}
+
+.itemName{
+  font-size:20px;
+  font-weight:900;
+  margin-top:8px;
+}
+
+.common{color:#ddd}
+.rare{color:#52a7ff}
+.epic{color:#bd70ff}
+.legendary{
+  color:#ffb83e;
+  text-shadow:0 0 12px #ff8b00;
+}
+
+.itemStats{
+  margin-top:10px;
+  color:#999;
+  font-size:13px;
+  line-height:1.7;
+}
+
+.modalBtn{
+  width:100%;
+  padding:14px;
+  margin-top:8px;
+  border-radius:10px;
+  background:#282c38;
+  color:#fff;
+  font-weight:800;
+}
+
+.equipBtn{
+  background:linear-gradient(135deg,#7042e9,#3b208b);
+}
+
+/* ---------- INVENTORY ---------- */
+
+.inventoryGrid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:8px;
+  max-height:330px;
+  overflow:auto;
+}
+
+.inventoryItem{
+  padding:12px;
+  background:#11131a;
+  border:1px solid #303442;
+  border-radius:10px;
+  text-align:left;
+}
+
+.inventoryItem strong{
+  display:block;
+  margin-bottom:4px;
+}
+
+.inventoryItem small{
+  color:#888;
+}
+
+/* ---------- GAME OVER ---------- */
+
+.gameOverTitle{
+  font-size:35px;
+  font-weight:900;
+  color:#ff4963;
+}
+
+.gameOverText{
+  color:#999;
+  margin:15px 0 25px;
+}
+
+/* ---------- BOSS ---------- */
+
+.bossAura{
+  filter:
+    drop-shadow(0 0 15px #ff3155)
+    drop-shadow(0 0 35px #ff3155);
+}
+
+/* ---------- TOAST ---------- */
+
+.toast{
+  position:absolute;
+  top:95px;
+  left:50%;
+  transform:translateX(-50%);
+  background:rgba(20,22,30,.95);
+  border:1px solid #44495a;
+  padding:9px 15px;
+  border-radius:20px;
+  color:#fff;
+  font-size:12px;
+  z-index:50;
+  opacity:0;
+  pointer-events:none;
+  transition:.3s;
+}
+
+.toast.show{
+  opacity:1;
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="game">
+
+  <!-- TITLE -->
+
+  <div id="titleScreen">
+    <div class="logo">DARK LOOT</div>
+    <div class="subtitle">深淵の迷宮</div>
+
+    <button class="startBtn" onclick="startGame()">
+      ⚔️ 冒険を始める
+    </button>
+  </div>
+
+
+  <!-- GAME -->
+
+  <div id="gameScreen">
+
+    <div class="topHud">
+
+      <div class="playerRow">
+        <div>
+          <div class="playerName">勇者</div>
+          <div class="level">Lv.<span id="level">1</span></div>
+        </div>
+
+        <div>💰 <span id="gold">0</span></div>
+      </div>
+
+      <div class="bar">
+        <div class="hp" id="playerHp"></div>
+      </div>
+
+      <div class="bar">
+        <div class="exp" id="playerExp"></div>
+      </div>
+
+      <div class="stats">
+        <span>HP <b id="hpText">100 / 100</b></span>
+        <span>ATK <b id="atkText">12</b></span>
+      </div>
+
+    </div>
+
+
+    <div class="dungeon">
+
+      <div class="floor">
+        FLOOR <span id="floor">1</span>
+      </div>
+
+      <div class="enemyArea">
+
+        <div class="enemyShadow"></div>
+
+        <div class="enemy" id="enemyEmoji">👹</div>
+
+        <div class="enemyName" id="enemyName">
+          深淵のゴブリン
+        </div>
+
+        <div class="enemyHp">
+          <div class="enemyHpInner" id="enemyHp"></div>
+        </div>
+
+        <div class="enemyInfo">
+          HP <span id="enemyHpText">60 / 60</span>
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <div class="bottom">
+
+      <div class="actions">
+
+        <button class="action attack" onclick="attack()">
+          ⚔️ 攻撃
+        </button>
+
+        <button class="action" onclick="useSkill()">
+          🔥 スキル
+        </button>
+
+        <button class="action" onclick="heal()">
+          🧪 回復
+        </button>
+
+      </div>
+
+      <div class="menu">
+
+        <button onclick="openInventory()">
+          <span>🎒</span>
+          装備
+        </button>
+
+        <button onclick="showStats()">
+          <span>📊</span>
+          ステータス
+        </button>
+
+        <button onclick="showToast('この機能は開発中！')">
+          <span>🏆</span>
+          実績
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- LOOT -->
+
+  <div id="lootModal">
+
+    <div class="modal">
+
+      <div class="modalTitle">
+        ✨ アイテムドロップ！
+      </div>
+
+      <div class="item">
+
+        <div class="itemIcon" id="lootIcon">⚔️</div>
+
+        <div class="itemName" id="lootName">
+          古びた剣
+        </div>
+
+        <div class="itemStats" id="lootStats">
+        </div>
+
+      </div>
+
+      <button class="modalBtn equipBtn" onclick="equipLoot()">
+        ⚔️ 装備する
+      </button>
+
+      <button class="modalBtn" onclick="closeLoot()">
+        そのまま拾う
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <!-- INVENTORY -->
+
+  <div id="inventoryModal">
+
+    <div class="modal">
+
+      <div class="modalTitle">
+        🎒 装備・アイテム
+      </div>
+
+      <div class="inventoryGrid" id="inventory">
+      </div>
+
+      <button class="modalBtn" onclick="closeInventory()">
+        閉じる
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <!-- GAME OVER -->
+
+  <div id="gameOver">
+
+    <div class="modal">
+
+      <div class="gameOverTitle">
+        YOU DIED
+      </div>
+
+      <div class="gameOverText">
+        深淵に飲み込まれてしまった……
+      </div>
+
+      <button class="modalBtn equipBtn" onclick="restart()">
+        🔥 再挑戦
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <div class="toast" id="toast"></div>
+
+</div>
+
+
+<script>
+
+/* =========================
+   GAME DATA
+========================= */
+
+let player = {
+  level:1,
+  maxHp:100,
+  hp:100,
+  atk:12,
+  exp:0,
+  expMax:100,
+  gold:0,
+  potions:3
+};
+
+let floor = 1;
+
+let enemy = {};
+
+let inventory = [];
+
+let currentLoot = null;
+
+
+/* =========================
+   ENEMIES
+========================= */
+
+const enemies = [
+
+  {
+    name:"深淵のゴブリン",
+    emoji:"👹",
+    hp:60,
+    atk:7
+  },
+
+  {
+    name:"呪われた狼",
+    emoji:"🐺",
+    hp:80,
+    atk:9
+  },
+
+  {
+    name:"闇の騎士",
+    emoji:"🛡️",
+    hp:120,
+    atk:12
+  },
+
+  {
+    name:"魔界の獣",
+    emoji:"🐲",
+    hp:170,
+    atk:15
+  }
+
+];
+
+
+/* =========================
+   START
+========================= */
+
+function startGame(){
+
+  document.getElementById("titleScreen").style.display="none";
+
+  document.getElementById("gameScreen").style.display="block";
+
+  spawnEnemy();
+
+  updateUI();
+
+}
+
+
+/* =========================
+   ENEMY
+========================= */
+
+function spawnEnemy(){
+
+  let base =
+    enemies[
+      Math.min(
+        Math.floor((floor-1)/3),
+        enemies.length-1
+      )
+    ];
+
+  let multiplier = 1 + (floor-1)*0.15;
+
+  enemy = {
+
+    name:base.name,
+
+    emoji:base.emoji,
+
+    maxHp:Math.floor(base.hp*multiplier),
+
+    hp:Math.floor(base.hp*multiplier),
+
+    atk:Math.floor(base.atk*multiplier)
+
+  };
+
+  if(floor % 10 === 0){
+
+    enemy.name="👑 深淵の支配者";
+
+    enemy.emoji="👿";
+
+    enemy.maxHp*=3;
+
+    enemy.hp=enemy.maxHp;
+
+    enemy.atk*=1.7;
+
+  }
+
+  document.getElementById("enemyName").textContent=enemy.name;
+
+  document.getElementById("enemyEmoji").textContent=enemy.emoji;
+
+  if(floor % 10 === 0){
+
+    document
+      .getElementById("enemyEmoji")
+      .classList.add("bossAura");
+
+  }else{
+
+    document
+      .getElementById("enemyEmoji")
+      .classList.remove("bossAura");
+
+  }
+
+  updateUI();
+
+}
+
+
+/* =========================
+   ATTACK
+========================= */
+
+function attack(){
+
+  if(enemy.hp<=0)return;
+
+  let damage =
+    player.atk +
+    Math.floor(Math.random()*7);
+
+  let critical =
+    Math.random()<0.12;
+
+  if(critical){
+
+    damage*=2;
+
+  }
+
+  enemy.hp-=damage;
+
+  showDamage(damage,critical);
+
+  enemyAttack();
+
+  if(enemy.hp<=0){
+
+    enemyDefeated();
+
+  }
+
+  updateUI();
+
+}
+
+
+/* =========================
+   SKILL
+========================= */
+
+function useSkill(){
+
+  if(enemy.hp<=0)return;
+
+  let damage =
+    player.atk*2 +
+    Math.floor(Math.random()*15);
+
+  enemy.hp-=damage;
+
+  showDamage(damage,true);
+
+  enemyAttack();
+
+  if(enemy.hp<=0){
+
+    enemyDefeated();
+
+  }
+
+  updateUI();
+
+}
+
+
+/* =========================
+   ENEMY ATTACK
+========================= */
+
+function enemyAttack(){
+
+  if(enemy.hp<=0)return;
+
+  let damage =
+    enemy.atk +
+    Math.floor(Math.random()*5);
+
+  player.hp-=damage;
+
+  if(player.hp<=0){
+
+    player.hp=0;
+
+    updateUI();
+
+    setTimeout(gameOver,300);
+
+  }
+
+}
+
+
+/* =========================
+   ENEMY DEFEATED
+========================= */
+
+function enemyDefeated(){
+
+  let gainedExp =
+    25 +
+    floor*6;
+
+  let gainedGold =
+    10 +
+    Math.floor(Math.random()*20) +
+    floor*3;
+
+  player.exp+=gainedExp;
+
+  player.gold+=gainedGold;
+
+  showToast(
+    "敵を倒した！ +" +
+    gainedExp +
+    " EXP"
+  );
+
+  levelCheck();
+
+  let dropChance =
+    Math.random();
+
+  if(dropChance < .8){
+
+    setTimeout(dropItem,450);
+
+  }else{
+
+    setTimeout(nextFloor,450);
+
+  }
+
+}
+
+
+/* =========================
+   LEVEL
+========================= */
+
+function levelCheck(){
+
+  while(player.exp>=player.expMax){
+
+    player.exp-=player.expMax;
+
+    player.level++;
+
+    player.expMax =
+      Math.floor(player.expMax*1.35);
+
+    player.maxHp+=20;
+
+    player.hp=player.maxHp;
+
+    player.atk+=5;
+
+    showToast(
+      "🎉 LEVEL UP! Lv." +
+      player.level
+    );
+
+  }
+
+}
+
+
+/* =========================
+   LOOT
+========================= */
+
+function dropItem(){
+
+  let roll=Math.random();
+
+  let rarity;
+
+  if(roll<.03){
+
+    rarity={
+      name:"LEGENDARY",
+      class:"legendary",
+      multiplier:2.5
+    };
+
+  }else if(roll<.12){
+
+    rarity={
+      name:"EPIC",
+      class:"epic",
+      multiplier:1.8
+    };
+
+  }else if(roll<.35){
+
+    rarity={
+      name:"RARE",
+      class:"rare",
+      multiplier:1.4
+    };
+
+  }else{
+
+    rarity={
+      name:"COMMON",
+      class:"common",
+      multiplier:1
+    };
+
+  }
+
+  let weapons=[
+
+    ["⚔️","漆黒の剣"],
+
+    ["🗡️","血染めのダガー"],
+
+    ["🔨","深淵のハンマー"],
+
+    ["🪓","処刑人の斧"],
+
+    ["🏹","月影の弓"]
+
+  ];
+
+  let weapon =
+    weapons[
+      Math.floor(
+        Math.random()*weapons.length
+      )
+    ];
+
+  let atk =
+    Math.floor(
+      (8+floor*3) *
+      rarity.multiplier
+    );
+
+  currentLoot={
+
+    icon:weapon[0],
+
+    name:weapon[1],
+
+    rarity:rarity.name,
+
+    rarityClass:rarity.class,
+
+    atk:atk
+
+  };
+
+  document.getElementById("lootIcon").textContent=
+    currentLoot.icon;
+
+  document.getElementById("lootName").textContent=
+    currentLoot.name;
+
+  document.getElementById("lootName").className=
+    "itemName "+currentLoot.rarityClass;
+
+  document.getElementById("lootStats").innerHTML=
+    `<b class="${currentLoot.rarityClass}">
+      ★ ${currentLoot.rarity}
+    </b>
+    <br>
+    攻撃力 +${currentLoot.atk}`;
+
+  document.getElementById("lootModal").style.display=
+    "flex";
+
+}
+
+
+/* =========================
+   EQUIP
+========================= */
+
+function equipLoot(){
+
+  if(!currentLoot)return;
+
+  player.atk+=currentLoot.atk;
+
+  inventory.push(currentLoot);
+
+  showToast(
+    currentLoot.name+
+    " を装備した！"
+  );
+
+  currentLoot=null;
+
+  document.getElementById("lootModal").style.display=
+    "none";
+
+  nextFloor();
+
+  updateUI();
+
+}
+
+
+/* =========================
+   CLOSE LOOT
+========================= */
+
+function closeLoot(){
+
+  if(currentLoot){
+
+    inventory.push(currentLoot);
+
+  }
+
+  currentLoot=null;
+
+  document.getElementById("lootModal").style.display=
+    "none";
+
+  nextFloor();
+
+}
+
+
+/* =========================
+   FLOOR
+========================= */
+
+function nextFloor(){
+
+  floor++;
+
+  spawnEnemy();
+
+  updateUI();
+
+}
+
+
+/* =========================
+   HEAL
+========================= */
+
+function heal(){
+
+  if(player.potions<=0){
+
+    showToast("回復薬がない！");
+
+    return;
+
+  }
+
+  if(player.hp>=player.maxHp){
+
+    showToast("HPは満タン！");
+
+    return;
+
+  }
+
+  player.potions--;
+
+  player.hp=
+    Math.min(
+      player.maxHp,
+      player.hp+50
+    );
+
+  showToast("🧪 HPを回復した！");
+
+  updateUI();
+
+}
+
+
+/* =========================
+   DAMAGE
+========================= */
+
+function showDamage(amount,critical=false){
+
+  let div=
+    document.createElement("div");
+
+  div.className=
+    "damage"+
+    (critical?" critical":"");
+
+  div.textContent=
+    (critical?"CRITICAL ":"-")+
+    amount;
+
+  document.getElementById("game").appendChild(div);
+
+  setTimeout(()=>{
+    div.remove();
+  },800);
+
+}
+
+
+/* =========================
+   INVENTORY
+========================= */
+
+function openInventory(){
+
+  let box=
+    document.getElementById("inventory");
+
+  box.innerHTML="";
+
+  if(inventory.length===0){
+
+    box.innerHTML=
+      `<div style="grid-column:1/-1;color:#777;padding:20px">
+      まだ装備を持っていません
+      </div>`;
+
+  }else{
+
+    inventory.forEach(item=>{
+
+      let div=
+        document.createElement("div");
+
+      div.className="inventoryItem";
+
+      div.innerHTML=`
+
+        <div style="font-size:30px">
+          ${item.icon}
+        </div>
+
+        <strong class="${item.rarityClass}">
+          ${item.name}
+        </strong>
+
+        <small>
+          ${item.rarity}
+          <br>
+          ATK +${item.atk}
+        </small>
+
+      `;
+
+      box.appendChild(div);
+
+    });
+
+  }
+
+  document.getElementById("inventoryModal").style.display=
+    "flex";
+
+}
+
+
+function closeInventory(){
+
+  document.getElementById("inventoryModal").style.display=
+    "none";
+
+}
+
+
+/* =========================
+   STATS
+========================= */
+
+function showStats(){
+
+  showToast(
+    "Lv."+player.level+
+    " / ATK "+player.atk+
+    " / 回復薬 "+player.potions
+  );
+
+}
+
+
+/* =========================
+   GAME OVER
+========================= */
+
+function gameOver(){
+
+  document.getElementById("gameOver").style.display=
+    "flex";
+
+}
+
+
+function restart(){
+
+  player={
+    level:1,
+    maxHp:100,
+    hp:100,
+    atk:12,
+    exp:0,
+    expMax:100,
+    gold:0,
+    potions:3
+  };
+
+  floor=1;
+
+  inventory=[];
+
+  document.getElementById("gameOver").style.display=
+    "none";
+
+  spawnEnemy();
+
+  updateUI();
+
+}
+
+
+/* =========================
+   UI
+========================= */
+
+function updateUI(){
+
+  document.getElementById("level").textContent=
+    player.level;
+
+  document.getElementById("gold").textContent=
+    player.gold;
+
+  document.getElementById("atkText").textContent=
+    player.atk;
+
+  document.getElementById("floor").textContent=
+    floor;
+
+  document.getElementById("hpText").textContent=
+    player.hp+
+    " / "+
+    player.maxHp;
+
+  document.getElementById("playerHp").style.width=
+    (player.hp/player.maxHp*100)+"%";
+
+  document.getElementById("playerExp").style.width=
+    (player.exp/player.expMax*100)+"%";
+
+  if(enemy.maxHp){
+
+    document.getElementById("enemyHp").style.width=
+      Math.max(
+        0,
+        enemy.hp/enemy.maxHp*100
+      )+"%";
+
+    document.getElementById("enemyHpText").textContent=
+      Math.max(0,enemy.hp)+
+      " / "+
+      enemy.maxHp;
+
+  }
+
+}
+
+
+/* =========================
+   TOAST
+========================= */
+
+let toastTimer;
+
+function showToast(text){
+
+  let toast=
+    document.getElementById("toast");
+
+  toast.textContent=text;
+
+  toast.classList.add("show");
+
+  clearTimeout(toastTimer);
+
+  toastTimer=
+    setTimeout(()=>{
+      toast.classList.remove("show");
+    },1800);
+
+}
+
+</script>
+
+</body>
+</html>
