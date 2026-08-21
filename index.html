@@ -1,0 +1,4286 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#080914">
+<title>DARK LOOT</title>
+
+<style>
+*{
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
+}
+
+html,body{
+  margin:0;
+  width:100%;
+  height:100%;
+  overflow:hidden;
+  background:#070812;
+  color:#fff;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+
+button{
+  font:inherit;
+  color:inherit;
+  border:0;
+  outline:none;
+  cursor:pointer;
+  touch-action:manipulation;
+}
+
+button:active{
+  transform:scale(.96);
+}
+
+#app{
+  position:relative;
+  width:100%;
+  height:100%;
+  overflow:hidden;
+  background:
+    radial-gradient(circle at 50% 10%,rgba(125,75,255,.22),transparent 35%),
+    radial-gradient(circle at 10% 80%,rgba(0,180,255,.08),transparent 30%),
+    linear-gradient(180deg,#0c0e1b,#05060b);
+}
+
+/* TOP */
+
+.topbar{
+  position:absolute;
+  z-index:30;
+  top:0;
+  left:0;
+  right:0;
+  height:72px;
+  padding:10px 12px;
+  background:rgba(5,6,13,.94);
+  border-bottom:1px solid rgba(255,255,255,.08);
+  backdrop-filter:blur(15px);
+}
+
+.logo{
+  font-size:18px;
+  font-weight:1000;
+  letter-spacing:4px;
+}
+
+.logoSub{
+  color:#74778d;
+  font-size:7px;
+  letter-spacing:2px;
+  margin-top:2px;
+}
+
+.currencyBox{
+  position:absolute;
+  right:9px;
+  top:10px;
+  display:flex;
+  gap:5px;
+}
+
+.currency{
+  min-width:75px;
+  height:28px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:4px;
+  border-radius:15px;
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.08);
+  font-size:10px;
+  font-weight:900;
+}
+
+.gold{color:#ffd65a}
+.ruby{color:#ff6c9c}
+
+/* MAIN */
+
+.main{
+  position:absolute;
+  top:72px;
+  left:0;
+  right:0;
+  bottom:68px;
+  overflow:hidden;
+}
+
+.screen{
+  display:none;
+  width:100%;
+  height:100%;
+  overflow-y:auto;
+  padding:10px 10px 25px;
+}
+
+.screen.active{
+  display:block;
+}
+
+.title{
+  margin:5px 2px 12px;
+  font-size:21px;
+  font-weight:1000;
+}
+
+.subtitle{
+  margin:-7px 2px 12px;
+  color:#777a91;
+  font-size:9px;
+}
+
+.card{
+  margin-bottom:10px;
+  padding:13px;
+  border-radius:18px;
+  background:rgba(255,255,255,.045);
+  border:1px solid rgba(255,255,255,.075);
+  box-shadow:0 10px 30px rgba(0,0,0,.18);
+}
+
+.sectionTitle{
+  margin-bottom:9px;
+  color:#a9acbe;
+  font-size:11px;
+  font-weight:900;
+}
+
+.bigButton{
+  width:100%;
+  min-height:45px;
+  border-radius:13px;
+  background:linear-gradient(135deg,#6745ff,#a15fff);
+  font-size:12px;
+  font-weight:1000;
+}
+
+.smallButton{
+  min-height:31px;
+  padding:0 10px;
+  border-radius:9px;
+  background:#6745ff;
+  font-size:8px;
+  font-weight:900;
+}
+
+.smallButton.gray{
+  background:#303342;
+}
+
+.smallButton.red{
+  background:#7b263d;
+}
+
+.smallButton.green{
+  background:#17664c;
+}
+
+/* BATTLE */
+
+.battle{
+  height:100%;
+  display:flex;
+  flex-direction:column;
+}
+
+.stage{
+  position:relative;
+  height:48%;
+  min-height:275px;
+  overflow:hidden;
+  border-radius:22px;
+  background:
+    radial-gradient(circle at 50% 62%,rgba(120,75,255,.22),transparent 38%),
+    radial-gradient(circle at 80% 15%,rgba(0,190,255,.08),transparent 30%),
+    linear-gradient(145deg,#15192b,#080a12);
+  border:1px solid rgba(255,255,255,.09);
+  box-shadow:0 20px 45px rgba(0,0,0,.35);
+}
+
+.floorLabel{
+  position:absolute;
+  left:13px;
+  top:11px;
+  color:#85899d;
+  font-size:8px;
+  letter-spacing:2px;
+}
+
+.floorNumber{
+  position:absolute;
+  right:13px;
+  top:8px;
+  color:#d7c9ff;
+  font-size:18px;
+  font-weight:1000;
+}
+
+.floorNumber small{
+  color:#777a91;
+  font-size:8px;
+}
+
+.bossLabel{
+  position:absolute;
+  left:50%;
+  top:38px;
+  transform:translateX(-50%);
+  display:none;
+  color:#ff596c;
+  font-size:10px;
+  font-weight:1000;
+  letter-spacing:3px;
+}
+
+.bossLabel.show{
+  display:block;
+}
+
+.arena{
+  position:absolute;
+  left:50%;
+  bottom:20px;
+  width:230px;
+  height:80px;
+  transform:translateX(-50%);
+  border-radius:50%;
+  background:radial-gradient(ellipse,rgba(132,80,255,.22),transparent 68%);
+  filter:blur(6px);
+}
+
+.enemy{
+  position:absolute;
+  left:50%;
+  top:49%;
+  transform:translate(-50%,-50%);
+  text-align:center;
+  z-index:5;
+}
+
+.enemyVisual{
+  width:135px;
+  height:135px;
+  margin:auto;
+  display:grid;
+  place-items:center;
+}
+
+.enemyCore{
+  position:relative;
+  width:92px;
+  height:92px;
+  display:grid;
+  place-items:center;
+  border-radius:40% 48% 42% 48%;
+  background:linear-gradient(145deg,#7653ff,#24134c);
+  box-shadow:
+    0 18px 30px rgba(0,0,0,.5),
+    0 0 32px rgba(112,70,255,.30),
+    inset 0 2px rgba(255,255,255,.18);
+  animation:float 2s ease-in-out infinite;
+}
+
+.enemyCore:before,
+.enemyCore:after{
+  content:"";
+  position:absolute;
+  top:29px;
+  width:12px;
+  height:18px;
+  border-radius:50%;
+  background:#dfffff;
+  box-shadow:0 0 10px rgba(100,230,255,.7);
+}
+
+.enemyCore:before{left:21px}
+.enemyCore:after{right:21px}
+
+.enemyMouth{
+  position:absolute;
+  left:50%;
+  bottom:20px;
+  width:30px;
+  height:10px;
+  transform:translateX(-50%);
+  border-radius:0 0 15px 15px;
+  background:#08060d;
+}
+
+.enemy.hit .enemyCore{
+  animation:hit .16s;
+}
+
+@keyframes float{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-7px)}
+}
+
+@keyframes hit{
+  0%{transform:translateX(0)}
+  30%{transform:translateX(-10px)}
+  60%{transform:translateX(10px)}
+  100%{transform:translateX(0)}
+}
+
+.enemyName{
+  font-size:13px;
+  font-weight:1000;
+}
+
+.enemyHpBar{
+  width:190px;
+  height:10px;
+  margin:7px auto 0;
+  overflow:hidden;
+  border-radius:10px;
+  background:#292b36;
+}
+
+.enemyHpFill{
+  width:100%;
+  height:100%;
+  background:linear-gradient(90deg,#ff375e,#ff7352);
+  transition:.12s;
+}
+
+.enemyHpText{
+  margin-top:3px;
+  color:#a1a3b2;
+  font-size:8px;
+}
+
+.damage{
+  position:absolute;
+  left:50%;
+  top:43%;
+  transform:translate(-50%,-50%);
+  color:#fff;
+  font-size:22px;
+  font-weight:1000;
+  text-shadow:0 0 15px #ff4d7d;
+  pointer-events:none;
+  animation:damage .45s forwards;
+  z-index:20;
+}
+
+.damage.crit{
+  color:#ffd75a;
+  font-size:29px;
+}
+
+@keyframes damage{
+  0%{opacity:1;transform:translate(-50%,-50%) scale(.7)}
+  100%{opacity:0;transform:translate(-50%,-100px) scale(1.15)}
+}
+
+/* PLAYER */
+
+.playerPanel{
+  margin-top:7px;
+  padding:9px;
+  border-radius:17px;
+  background:rgba(255,255,255,.045);
+  border:1px solid rgba(255,255,255,.07);
+}
+
+.playerName{
+  display:flex;
+  justify-content:space-between;
+  font-size:11px;
+  font-weight:1000;
+}
+
+.playerLevel{
+  color:#aaa1ff;
+}
+
+.barRow{
+  display:grid;
+  grid-template-columns:25px 1fr 72px;
+  gap:6px;
+  align-items:center;
+  margin-top:6px;
+}
+
+.bar{
+  height:11px;
+  overflow:hidden;
+  border-radius:10px;
+  background:#252731;
+}
+
+.barFill{
+  width:100%;
+  height:100%;
+  transition:.2s;
+}
+
+.hpFill{
+  background:linear-gradient(90deg,#ff355d,#ff7253);
+}
+
+.xpFill{
+  background:linear-gradient(90deg,#704cff,#bd7cff);
+}
+
+.barText{
+  color:#c5c6d2;
+  text-align:right;
+  font-size:8px;
+  font-weight:900;
+}
+
+.combatInfo{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:6px;
+  margin-top:7px;
+}
+
+.statCard{
+  padding:7px 3px;
+  border-radius:13px;
+  text-align:center;
+  background:rgba(255,255,255,.04);
+}
+
+.statCard .value{
+  font-size:12px;
+  font-weight:1000;
+}
+
+.statCard .label{
+  color:#77798d;
+  font-size:7px;
+}
+
+.attackArea{
+  display:grid;
+  grid-template-columns:1fr 86px;
+  gap:7px;
+  margin-top:7px;
+}
+
+.attackButton{
+  width:100%;
+  height:54px;
+  border-radius:17px;
+  background:linear-gradient(135deg,#6745ff,#a15fff);
+  box-shadow:0 12px 30px rgba(94,60,255,.30);
+  font-size:16px;
+  font-weight:1000;
+}
+
+.autoButton{
+  height:54px;
+  border-radius:17px;
+  background:#303342;
+  font-size:10px;
+  font-weight:1000;
+}
+
+.autoButton.on{
+  background:linear-gradient(135deg,#087e5d,#21c78b);
+  box-shadow:0 0 20px rgba(30,220,150,.2);
+}
+
+/* NAV */
+
+.bottomNav{
+  position:absolute;
+  z-index:30;
+  left:0;
+  right:0;
+  bottom:0;
+  height:68px;
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  background:rgba(5,6,12,.97);
+  border-top:1px solid rgba(255,255,255,.08);
+  backdrop-filter:blur(18px);
+}
+
+.navButton{
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  gap:3px;
+  background:transparent;
+  color:#696c80;
+  font-size:8px;
+}
+
+.navButton .navIcon{
+  font-size:19px;
+}
+
+.navButton.active{
+  color:#a996ff;
+}
+
+/* GRIDS */
+
+.grid2{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:8px;
+}
+
+.grid3{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:7px;
+}
+
+/* ITEMS */
+
+.item{
+  padding:10px;
+  border-radius:15px;
+  background:rgba(255,255,255,.045);
+  border:1px solid rgba(255,255,255,.07);
+}
+
+.item.equipped{
+  border-color:#9b7aff;
+  box-shadow:0 0 16px rgba(120,80,255,.16);
+}
+
+.itemIcon{
+  font-size:29px;
+  text-align:center;
+}
+
+.itemName{
+  margin-top:4px;
+  font-size:10px;
+  font-weight:900;
+  text-align:center;
+}
+
+.itemRarity{
+  margin-top:3px;
+  text-align:center;
+  font-size:7px;
+  font-weight:1000;
+}
+
+.itemStats{
+  min-height:30px;
+  margin-top:6px;
+  color:#aaaabb;
+  font-size:7px;
+  text-align:center;
+  line-height:1.5;
+}
+
+.itemActions{
+  display:flex;
+  gap:4px;
+  margin-top:7px;
+}
+
+.equipmentSlots{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:7px;
+}
+
+.equipSlot{
+  padding:9px 5px;
+  border-radius:13px;
+  text-align:center;
+  background:rgba(255,255,255,.035);
+  border:1px solid rgba(255,255,255,.07);
+}
+
+.equipIcon{
+  font-size:23px;
+}
+
+.equipLabel{
+  margin-top:3px;
+  color:#74778d;
+  font-size:7px;
+}
+
+.equipItem{
+  margin-top:4px;
+  font-size:8px;
+  font-weight:900;
+}
+
+/* ENHANCE */
+
+.upgrade{
+  padding:11px;
+  margin-bottom:8px;
+  border-radius:15px;
+  background:rgba(255,255,255,.045);
+  border:1px solid rgba(255,255,255,.07);
+}
+
+.upgradeHead{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.upgradeName{
+  font-size:11px;
+  font-weight:1000;
+}
+
+.upgradeValue{
+  color:#aaa1ff;
+  font-size:11px;
+  font-weight:1000;
+}
+
+.upgradeBottom{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-top:7px;
+}
+
+.cost{
+  color:#ffd65a;
+  font-size:9px;
+  font-weight:900;
+}
+
+/* STATUS */
+
+.statusBox{
+  padding:12px;
+  border-radius:15px;
+  background:rgba(255,255,255,.045);
+  border:1px solid rgba(255,255,255,.07);
+}
+
+.statusLabel{
+  color:#74778d;
+  font-size:8px;
+}
+
+.statusValue{
+  margin-top:4px;
+  font-size:17px;
+  font-weight:1000;
+}
+
+/* RANKING */
+
+.rankRow{
+  display:flex;
+  align-items:center;
+  gap:9px;
+  padding:11px;
+  margin-bottom:6px;
+  border-radius:13px;
+  background:rgba(255,255,255,.045);
+}
+
+.rankNumber{
+  width:30px;
+  font-size:18px;
+  text-align:center;
+}
+
+.rankName{
+  flex:1;
+  font-size:10px;
+  font-weight:900;
+}
+
+.rankFloor{
+  color:#aaa1ff;
+  font-size:9px;
+  font-weight:900;
+}
+
+/* MISSION */
+
+.mission{
+  padding:11px;
+  margin-bottom:7px;
+  border-radius:14px;
+  background:rgba(255,255,255,.045);
+}
+
+.missionTop{
+  display:flex;
+  justify-content:space-between;
+  font-size:10px;
+  font-weight:900;
+}
+
+.missionProgress{
+  margin-top:7px;
+  height:7px;
+  border-radius:10px;
+  overflow:hidden;
+  background:#252731;
+}
+
+.missionFill{
+  height:100%;
+  background:linear-gradient(90deg,#704cff,#c06cff);
+}
+
+/* MODAL */
+
+.modal{
+  position:absolute;
+  z-index:100;
+  inset:0;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  background:rgba(0,0,0,.72);
+  backdrop-filter:blur(8px);
+}
+
+.modal.show{
+  display:flex;
+}
+
+.modalBox{
+  width:100%;
+  max-width:360px;
+  max-height:90vh;
+  overflow:auto;
+  padding:20px;
+  border-radius:22px;
+  background:linear-gradient(180deg,#171a2c,#0b0d17);
+  border:1px solid rgba(255,255,255,.1);
+  box-shadow:0 30px 80px rgba(0,0,0,.6);
+  text-align:center;
+}
+
+.modalTitle{
+  font-size:22px;
+  font-weight:1000;
+}
+
+.modalText{
+  margin:10px 0 16px;
+  color:#aaaabd;
+  font-size:10px;
+  line-height:1.8;
+}
+
+/* TOAST */
+
+.toast{
+  position:absolute;
+  z-index:200;
+  left:50%;
+  bottom:80px;
+  transform:translateX(-50%) translateY(20px);
+  opacity:0;
+  pointer-events:none;
+  padding:9px 14px;
+  border-radius:15px;
+  background:rgba(20,22,35,.96);
+  border:1px solid rgba(255,255,255,.1);
+  color:#fff;
+  font-size:9px;
+  font-weight:900;
+  transition:.25s;
+}
+
+.toast.show{
+  opacity:1;
+  transform:translateX(-50%) translateY(0);
+}
+
+/* LOOT */
+
+.loot{
+  position:absolute;
+  z-index:80;
+  left:50%;
+  top:42%;
+  transform:translate(-50%,-50%) scale(.7);
+  opacity:0;
+  pointer-events:none;
+  padding:13px 20px;
+  border-radius:17px;
+  background:rgba(20,20,35,.96);
+  border:1px solid rgba(255,215,90,.35);
+  box-shadow:0 0 30px rgba(255,190,50,.12);
+  text-align:center;
+}
+
+.loot.show{
+  animation:loot .7s forwards;
+}
+
+@keyframes loot{
+  0%{opacity:0;transform:translate(-50%,-50%) scale(.7)}
+  20%{opacity:1;transform:translate(-50%,-50%) scale(1.05)}
+  70%{opacity:1;transform:translate(-50%,-60%) scale(1)}
+  100%{opacity:0;transform:translate(-50%,-80%) scale(.95)}
+}
+
+.muted{
+  color:#777a91;
+  font-size:8px;
+}
+</style>
+</head>
+
+<body>
+
+<div id="app">
+
+<div class="topbar">
+  <div class="logo">DARK LOOT</div>
+  <div class="logoSub">ENDLESS HACK & SLASH</div>
+
+  <div class="currencyBox">
+    <div class="currency gold">🪙 <span id="gold">0</span></div>
+    <div class="currency ruby">💎 <span id="ruby">0</span></div>
+  </div>
+</div>
+
+<div class="main">
+
+<!-- BATTLE -->
+<section id="battleScreen" class="screen active">
+
+<div class="battle">
+
+<div class="stage">
+
+<div class="floorLabel">CURRENT FLOOR</div>
+<div class="floorNumber">
+  <span id="floor">1</span>
+  <small>FLOOR</small>
+</div>
+
+<div id="bossLabel" class="bossLabel">⚠ BOSS ⚠</div>
+
+<div class="arena"></div>
+
+<div id="enemy" class="enemy">
+
+  <div class="enemyVisual">
+    <div class="enemyCore">
+      <div class="enemyMouth"></div>
+    </div>
+  </div>
+
+  <div id="enemyName" class="enemyName">闇の魔獣</div>
+
+  <div class="enemyHpBar">
+    <div id="enemyHpFill" class="enemyHpFill"></div>
+  </div>
+
+  <div id="enemyHpText" class="enemyHpText"></div>
+
+</div>
+
+<div id="loot" class="loot"></div>
+
+</div>
+
+<div class="playerPanel">
+
+<div class="playerName">
+  <span>⚔ DARK HERO</span>
+  <span class="playerLevel">Lv.<span id="level">1</span></span>
+</div>
+
+<div class="barRow">
+  <div>❤️</div>
+  <div class="bar">
+    <div id="hpFill" class="barFill hpFill"></div>
+  </div>
+  <div id="hpText" class="barText"></div>
+</div>
+
+<div class="barRow">
+  <div>✨</div>
+  <div class="bar">
+    <div id="xpFill" class="barFill xpFill"></div>
+  </div>
+  <div id="xpText" class="barText"></div>
+</div>
+
+<div class="combatInfo">
+
+<div class="statCard">
+  <div id="attackValue" class="value">10</div>
+  <div class="label">攻撃力</div>
+</div>
+
+<div class="statCard">
+  <div id="defenseValue" class="value">5</div>
+  <div class="label">防御力</div>
+</div>
+
+<div class="statCard">
+  <div id="critValue" class="value">5%</div>
+  <div class="label">クリティカル</div>
+</div>
+
+</div>
+
+<div class="attackArea">
+
+<button id="attackButton" class="attackButton">
+⚔ ATTACK
+</button>
+
+<button id="autoButton" class="autoButton">
+🤖 AUTO<br>
+<span id="autoText">OFF</span>
+</button>
+
+</div>
+
+</div>
+
+</div>
+</section>
+
+
+<!-- EQUIPMENT -->
+<section id="equipmentScreen" class="screen">
+
+<div class="title">🎒 装備</div>
+<div class="subtitle">集めた装備を確認・強化しよう</div>
+
+<div class="card">
+<div class="sectionTitle">装備中</div>
+
+<div class="equipmentSlots">
+
+<div class="equipSlot">
+<div class="equipIcon">⚔️</div>
+<div class="equipLabel">WEAPON</div>
+<div id="weaponSlot" class="equipItem">なし</div>
+</div>
+
+<div class="equipSlot">
+<div class="equipIcon">🛡️</div>
+<div class="equipLabel">ARMOR</div>
+<div id="armorSlot" class="equipItem">なし</div>
+</div>
+
+<div class="equipSlot">
+<div class="equipIcon">💍</div>
+<div class="equipLabel">RING</div>
+<div id="ringSlot" class="equipItem">なし</div>
+</div>
+
+</div>
+</div>
+
+<div class="card">
+<div class="sectionTitle">インベントリ</div>
+<div id="inventory" class="grid2"></div>
+</div>
+
+</section>
+
+
+<!-- ENHANCE -->
+<section id="enhanceScreen" class="screen">
+
+<div class="title">💰 強化</div>
+<div class="subtitle">コインを使って恒久的に強くなろう</div>
+
+<div class="card">
+
+<div class="upgrade">
+
+<div class="upgradeHead">
+<div class="upgradeName">⚔ 攻撃力</div>
+<div class="upgradeValue">Lv.<span id="atkLv">0</span></div>
+</div>
+
+<div class="upgradeBottom">
+<div class="cost">🪙 <span id="atkCost">50</span></div>
+<button class="smallButton" onclick="upgradeStat('attack')">強化</button>
+</div>
+
+</div>
+
+
+<div class="upgrade">
+
+<div class="upgradeHead">
+<div class="upgradeName">❤️ 最大HP</div>
+<div class="upgradeValue">Lv.<span id="hpLv">0</span></div>
+</div>
+
+<div class="upgradeBottom">
+<div class="cost">🪙 <span id="hpCost">50</span></div>
+<button class="smallButton" onclick="upgradeStat('hp')">強化</button>
+</div>
+
+</div>
+
+
+<div class="upgrade">
+
+<div class="upgradeHead">
+<div class="upgradeName">🛡 防御力</div>
+<div class="upgradeValue">Lv.<span id="defLv">0</span></div>
+</div>
+
+<div class="upgradeBottom">
+<div class="cost">🪙 <span id="defCost">50</span></div>
+<button class="smallButton" onclick="upgradeStat('defense')">強化</button>
+</div>
+
+</div>
+
+
+<div class="upgrade">
+
+<div class="upgradeHead">
+<div class="upgradeName">💥 クリティカル率</div>
+<div class="upgradeValue">Lv.<span id="critLv">0</span></div>
+</div>
+
+<div class="upgradeBottom">
+<div class="cost">🪙 <span id="critCost">100</span></div>
+<button class="smallButton" onclick="upgradeStat('crit')">強化</button>
+</div>
+
+</div>
+
+
+<div class="upgrade">
+
+<div class="upgradeHead">
+<div class="upgradeName">🪙 コイン獲得量</div>
+<div class="upgradeValue">Lv.<span id="goldLv">0</span></div>
+</div>
+
+<div class="upgradeBottom">
+<div class="cost">🪙 <span id="goldCost">150</span></div>
+<button class="smallButton" onclick="upgradeStat('gold')">強化</button>
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- REBIRTH -->
+<section id="rebirthScreen" class="screen">
+
+<div class="title">♻️ 転生</div>
+<div class="subtitle">さらなる力を求めて、すべてを超越する</div>
+
+<div class="card">
+
+<div style="font-size:40px;text-align:center">♻️</div>
+
+<div style="text-align:center;margin:10px 0;font-size:13px;font-weight:1000">
+転生回数：<span id="rebirthCount">0</span>
+</div>
+
+<div class="statusBox">
+<div class="statusLabel">現在の最高到達階</div>
+<div id="rebirthFloor" class="statusValue">1階</div>
+</div>
+
+<br>
+
+<div class="statusBox">
+<div class="statusLabel">転生で獲得できるルビー</div>
+<div id="rebirthReward" class="statusValue ruby">💎 0</div>
+</div>
+
+<br>
+
+<div class="modalText">
+100階に到達すると転生できます。<br>
+転生すると階層・レベル・コイン・装備などがリセットされます。<br>
+その代わり、ルビーと永久強化を獲得できます。
+</div>
+
+<button id="rebirthButton" class="bigButton" onclick="openRebirth()">
+♻️ 転生する
+</button>
+
+</div>
+
+<div class="card">
+
+<div class="sectionTitle">💎 ルビー永久強化</div>
+
+<div class="upgrade">
+<div class="upgradeHead">
+<div class="upgradeName">⚡ 転生パワー</div>
+<div class="upgradeValue">Lv.<span id="rubyPowerLv">0</span></div>
+</div>
+<div class="upgradeBottom">
+<div class="cost">💎 <span id="rubyPowerCost">1</span></div>
+<button class="smallButton" onclick="upgradeRuby('power')">強化</button>
+</div>
+</div>
+
+<div class="upgrade">
+<div class="upgradeHead">
+<div class="upgradeName">💰 永久コイン倍率</div>
+<div class="upgradeValue">Lv.<span id="rubyGoldLv">0</span></div>
+</div>
+<div class="upgradeBottom">
+<div class="cost">💎 <span id="rubyGoldCost">2</span></div>
+<button class="smallButton" onclick="upgradeRuby('gold')">強化</button>
+</div>
+</div>
+
+</div>
+
+</section>
+
+
+<!-- RANKING -->
+<section id="rankingScreen" class="screen">
+
+<div class="title">🏆 ランキング</div>
+<div class="subtitle">DARK LOOTの最高到達記録</div>
+
+<div class="card">
+
+<div id="ranking"></div>
+
+</div>
+
+<div class="card">
+<div class="sectionTitle">あなたの記録</div>
+
+<div class="statusBox">
+<div class="statusLabel">最高到達階</div>
+<div id="bestFloor" class="statusValue">1階</div>
+</div>
+
+</div>
+
+<div class="card">
+
+<div class="sectionTitle">📜 ミッション</div>
+
+<div id="missions"></div>
+
+</div>
+
+<div class="card">
+
+<div class="sectionTitle">🎰 ガチャ</div>
+
+<div class="statusBox">
+
+<div style="font-size:35px">🎁</div>
+
+<div class="muted" style="margin:8px">
+装備がランダムで手に入ります
+</div>
+
+<div style="color:#ffd65a;font-weight:1000;margin:8px">
+🪙 500コイン
+</div>
+
+<button class="bigButton" onclick="gacha()">
+🎰 ガチャを回す
+</button>
+
+</div>
+
+</div>
+
+</section>
+
+</div>
+
+
+<!-- BOTTOM NAV -->
+
+<div class="bottomNav">
+
+<button class="navButton active" data-screen="battleScreen">
+<div class="navIcon">⚔️</div>
+戦闘
+</button>
+
+<button class="navButton" data-screen="equipmentScreen">
+<div class="navIcon">🎒</div>
+装備
+</button>
+
+<button class="navButton" data-screen="enhanceScreen">
+<div class="navIcon">💰</div>
+強化
+</button>
+
+<button class="navButton" data-screen="rebirthScreen">
+<div class="navIcon">♻️</div>
+転生
+</button>
+
+<button class="navButton" data-screen="rankingScreen">
+<div class="navIcon">🏆</div>
+ランキング
+</button>
+
+</div>
+
+
+<!-- MODAL -->
+
+<div id="modal" class="modal">
+<div class="modalBox">
+<div id="modalTitle" class="modalTitle"></div>
+<div id="modalText" class="modalText"></div>
+<div id="modalButtons"></div>
+</div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+</div>
+
+
+<script>
+
+/* =====================================================
+   DARK LOOT
+   VER.2
+===================================================== */
+
+const SAVE_KEY="DARK_LOOT_SAVE_V2";
+
+
+let game={
+  floor:1,
+  bestFloor:1,
+
+  level:1,
+  xp:0,
+  xpNext:100,
+
+  hp:100,
+  maxHp:100,
+
+  baseAttack:10,
+  baseDefense:5,
+  baseCrit:5,
+
+  gold:500,
+  ruby:0,
+
+  rebirth:0,
+
+  auto:false,
+
+  upgrades:{
+    attack:0,
+    hp:0,
+    defense:0,
+    crit:0,
+    gold:0
+  },
+
+  rubyUpgrades:{
+    power:0,
+    gold:0
+  },
+
+  inventory:[],
+  equipped:{
+    weapon:null,
+    armor:null,
+    ring:null
+  },
+
+  missions:{
+    kills:0,
+    gold:0,
+    boss:0
+  },
+
+  totalKills:0,
+  totalGold:0,
+
+  settings:{
+    se:true,
+    bgm:false
+  }
+};
+
+
+let enemy={
+  hp:100,
+  maxHp:100,
+  name:"闇の魔獣",
+  boss:false,
+  defeated:false
+};
+
+let autoTimer=null;
+
+
+/* =====================================================
+   SAVE
+===================================================== */
+
+function saveGame(){
+
+  localStorage.setItem(
+    SAVE_KEY,
+    JSON.stringify(game)
+  );
+
+}
+
+function loadGame(){
+
+  try{
+
+    const data=localStorage.getItem(SAVE_KEY);
+
+    if(data){
+
+      const saved=JSON.parse(data);
+
+      game={
+        ...game,
+        ...saved,
+        upgrades:{
+          ...game.upgrades,
+          ...(saved.upgrades||{})
+        },
+        rubyUpgrades:{
+          ...game.rubyUpgrades,
+          ...(saved.rubyUpgrades||{})
+        },
+        equipped:{
+          ...game.equipped,
+          ...(saved.equipped||{})
+        },
+        missions:{
+          ...game.missions,
+          ...(saved.missions||{})
+        },
+        settings:{
+          ...game.settings,
+          ...(saved.settings||{})
+        }
+      };
+
+    }
+
+  }catch(e){
+
+    console.log("SAVE LOAD ERROR",e);
+
+  }
+
+}
+
+
+/* =====================================================
+   STATS
+===================================================== */
+
+function getAttack(){
+
+  let value=
+    game.baseAttack+
+    game.upgrades.attack*4;
+
+  value+=game.level*2;
+
+  value*=1+game.rubyUpgrades.power*.1;
+
+  for(const item of game.inventory){
+
+    if(item.id===game.equipped.weapon){
+      value+=item.attack;
+    }
+
+  }
+
+  return Math.floor(value);
+
+}
+
+
+function getDefense(){
+
+  let value=
+    game.baseDefense+
+    game.upgrades.defense*3;
+
+  for(const item of game.inventory){
+
+    if(item.id===game.equipped.armor){
+      value+=item.defense;
+    }
+
+  }
+
+  return Math.floor(value);
+
+}
+
+
+function getMaxHp(){
+
+  let value=
+    game.maxHp+
+    game.upgrades.hp*20+
+    game.level*10;
+
+  for(const item of game.inventory){
+
+    if(item.id===game.equipped.armor){
+      value+=item.hp;
+    }
+
+  }
+
+  return Math.floor(value);
+
+}
+
+
+function getCrit(){
+
+  return Math.min(
+    75,
+    game.baseCrit+
+    game.upgrades.crit*1.5
+  );
+
+}
+
+
+function getGoldMultiplier(){
+
+  return 1+
+    game.upgrades.gold*.1+
+    game.rubyUpgrades.gold*.2;
+
+}
+
+
+/* =====================================================
+   ENEMY
+===================================================== */
+
+function createEnemy(){
+
+  const boss=
+    game.floor%10===0;
+
+  const names=[
+    "闇の魔獣",
+    "夜の亡霊",
+    "深淵の騎士",
+    "黒炎の獣",
+    "呪われた兵士",
+    "奈落の怪物"
+  ];
+
+  enemy.boss=boss;
+
+  enemy.name=
+    boss
+      ? "👑 FLOOR BOSS"
+      : names[Math.floor(Math.random()*names.length)];
+
+  let base=
+    80+
+    Math.pow(game.floor,1.42)*18;
+
+  if(boss){
+    base*=5;
+  }
+
+  enemy.maxHp=Math.floor(base);
+  enemy.hp=enemy.maxHp;
+  enemy.defeated=false;
+
+  document.getElementById("bossLabel")
+    .classList.toggle("show",boss);
+
+  updateBattleUI();
+
+}
+
+
+/* =====================================================
+   ATTACK
+===================================================== */
+
+function attack(){
+
+  if(enemy.defeated)return;
+
+  let damage=getAttack();
+
+  let crit=
+    Math.random()*100<
+    getCrit();
+
+  if(crit){
+
+    damage*=2;
+
+  }
+
+  damage=Math.max(1,Math.floor(damage));
+
+  enemy.hp-=damage;
+
+  showDamage(damage,crit);
+
+  const el=document.getElementById("enemy");
+
+  el.classList.remove("hit");
+
+  void el.offsetWidth;
+
+  el.classList.add("hit");
+
+  if(enemy.hp<=0){
+
+    enemy.hp=0;
+
+    defeatEnemy();
+
+  }
+
+  updateBattleUI();
+
+}
+
+
+function showDamage(value,crit){
+
+  const d=document.createElement("div");
+
+  d.className="damage"+(crit?" crit":"");
+
+  d.textContent=
+    crit
+      ? "CRITICAL! "+value
+      : "-"+value;
+
+  document.querySelector(".stage").appendChild(d);
+
+  setTimeout(()=>{
+    d.remove();
+  },500);
+
+}
+
+
+/* =====================================================
+   ENEMY DEFEAT
+===================================================== */
+
+function defeatEnemy(){
+
+  if(enemy.defeated)return;
+
+  enemy.defeated=true;
+
+  const gold=
+    Math.floor(
+      (15+
+      game.floor*5+
+      Math.random()*20)
+      *getGoldMultiplier()
+    );
+
+  game.gold+=gold;
+  game.totalGold+=gold;
+
+  game.missions.kills++;
+  game.missions.gold+=gold;
+  game.totalKills++;
+
+  game.xp+=
+    25+
+    game.floor*4;
+
+  showLoot(
+    "🪙 +"+gold+
+    "<br>✨ EXP +"+(25+game.floor*4)
+  );
+
+  if(enemy.boss){
+
+    game.missions.boss++;
+
+    const bonus=
+      100+
+      game.floor*10;
+
+    game.gold+=bonus;
+
+    showToast(
+      "👑 BOSS DEFEATED! +"+bonus+"🪙"
+    );
+
+    if(Math.random()<.65){
+      dropItem(true);
+    }
+
+  }else{
+
+    if(Math.random()<.18){
+      dropItem(false);
+    }
+
+  }
+
+  checkLevelUp();
+
+  if(game.floor>game.bestFloor){
+    game.bestFloor=game.floor;
+  }
+
+  game.floor++;
+
+  saveGame();
+
+  setTimeout(()=>{
+
+    createEnemy();
+
+  },180);
+
+}
+
+
+/* =====================================================
+   LEVEL
+===================================================== */
+
+function checkLevelUp(){
+
+  while(game.xp>=game.xpNext){
+
+    game.xp-=game.xpNext;
+
+    game.level++;
+
+    game.xpNext=
+      Math.floor(
+        game.xpNext*1.25
+      );
+
+    game.hp=getMaxHp();
+
+    showToast(
+      "✨ LEVEL UP! Lv."+game.level
+    );
+
+  }
+
+}
+
+
+/* =====================================================
+   ITEMS
+===================================================== */
+
+const rarityData=[
+
+  {
+    name:"N",
+    multiplier:1,
+    chance:.5
+  },
+
+  {
+    name:"R",
+    multiplier:1.5,
+    chance:.3
+  },
+
+  {
+    name:"SR",
+    multiplier:2.3,
+    chance:.15
+  },
+
+  {
+    name:"SSR",
+    multiplier:4,
+    chance:.045
+  },
+
+  {
+    name:"UR",
+    multiplier:8,
+    chance:.005
+  }
+
+];
+
+
+function randomRarity(){
+
+  const r=Math.random();
+
+  let sum=0;
+
+  for(const data of rarityData){
+
+    sum+=data.chance;
+
+    if(r<=sum){
+
+      return data;
+
+    }
+
+  }
+
+  return rarityData[0];
+
+}
+
+
+function createItem(){
+
+  const rarity=randomRarity();
+
+  const types=[
+    {
+      type:"weapon",
+      icon:"⚔️",
+      name:"魔剣"
+    },
+    {
+      type:"armor",
+      icon:"🛡️",
+      name:"闇鎧"
+    },
+    {
+      type:"ring",
+      icon:"💍",
+      name:"深淵の指輪"
+    }
+  ];
+
+  const type=
+    types[Math.floor(Math.random()*types.length)];
+
+  const power=
+    Math.floor(
+      (10+game.floor*.8)
+      *rarity.multiplier
+    );
+
+  return{
+
+    id:
+      Date.now()+
+      Math.random(),
+
+    type:type.type,
+
+    icon:type.icon,
+
+    name:
+      rarity.name+
+      " "+type.name,
+
+    rarity:rarity.name,
+
+    attack:
+      type.type==="weapon"
+        ? power
+        : 0,
+
+    defense:
+      type.type==="armor"
+        ? Math.floor(power*.55)
+        : 0,
+
+    hp:
+      type.type==="armor"
+        ? Math.floor(power*3)
+        : 0,
+
+    crit:
+      type.type==="ring"
+        ? Math.min(15,Math.floor(power/5))
+        : 0,
+
+    level:1
+
+  };
+
+}
+
+
+function dropItem(force){
+
+  const item=createItem();
+
+  game.inventory.unshift(item);
+
+  if(game.inventory.length>20){
+    game.inventory.pop();
+  }
+
+  showLoot(
+    item.icon+
+    " "+item.name+
+    "<br><span class='muted'>装備を入手！</span>"
+  );
+
+  saveGame();
+
+}
+
+
+function equipItem(id){
+
+  const item=
+    game.inventory.find(
+      x=>x.id===id
+    );
+
+  if(!item)return;
+
+  game.equipped[item.type]=id;
+
+  game.hp=getMaxHp();
+
+  saveGame();
+
+  renderInventory();
+  updateBattleUI();
+
+  showToast(
+    item.name+" を装備！"
+  );
+
+}
+
+
+function unequipItem(type){
+
+  game.equipped[type]=null;
+
+  saveGame();
+
+  renderInventory();
+  updateBattleUI();
+
+}
+
+
+/* =====================================================
+   EQUIPMENT UI
+===================================================== */
+
+function renderInventory(){
+
+  const container=
+    document.getElementById("inventory");
+
+  container.innerHTML="";
+
+  if(game.inventory.length===0){
+
+    container.innerHTML=
+      `<div class="muted">
+        まだ装備を持っていません
+      </div>`;
+
+    return;
+
+  }
+
+  for(const item of game.inventory){
+
+    const equipped=
+      game.equipped[item.type]===item.id;
+
+    const card=
+      document.createElement("div");
+
+    card.className=
+      "item"+(equipped?" equipped":"");
+
+    card.innerHTML=`
+
+      <div class="itemIcon">${item.icon}</div>
+
+      <div class="itemName">
+        ${item.name}
+      </div>
+
+      <div class="itemRarity">
+        ${item.rarity}
+      </div>
+
+      <div class="itemStats">
+        ${item.attack?"⚔ +"+item.attack:""}
+        ${item.defense?"🛡 +"+item.defense:""}
+        ${item.hp?"❤️ +"+item.hp:""}
+        ${item.crit?"💥 +"+item.crit+"%":""}
+      </div>
+
+      <div class="itemActions">
+
+        ${
+          equipped
+          ? `<button
+              class="smallButton gray"
+              onclick="unequipItem('${item.type}')">
+              外す
+            </button>`
+          : `<button
+              class="smallButton"
+              onclick="equipItem(${item.id})">
+              装備
+            </button>`
+        }
+
+      </div>
+    `;
+
+    container.appendChild(card);
+
+  }
+
+  updateEquipmentSlots();
+
+}
+
+
+function updateEquipmentSlots(){
+
+  const types=[
+    ["weapon","weaponSlot"],
+    ["armor","armorSlot"],
+    ["ring","ringSlot"]
+  ];
+
+  for(const [type,id] of types){
+
+    const item=
+      game.inventory.find(
+        x=>x.id===game.equipped[type]
+      );
+
+    document.getElementById(id).textContent=
+      item
+        ? item.name
+        : "なし";
+
+  }
+
+}
+
+
+/* =====================================================
+   COIN UPGRADES
+===================================================== */
+
+function getUpgradeCost(type){
+
+  const lv=
+    game.upgrades[type];
+
+  const base={
+    attack:50,
+    hp:50,
+    defense:50,
+    crit:100,
+    gold:150
+  }[type];
+
+  return Math.floor(
+    base*Math.pow(1.18,lv)
+  );
+
+}
+
+
+function upgradeStat(type){
+
+  const cost=
+    getUpgradeCost(type);
+
+  if(game.gold<cost){
+
+    showToast("🪙 コインが足りません");
+
+    return;
+
+  }
+
+  game.gold-=cost;
+
+  game.upgrades[type]++;
+
+  game.hp=getMaxHp();
+
+  saveGame();
+
+  renderAll();
+
+  showToast(
+    "✨ 強化成功！"
+  );
+
+}
+
+
+/* =====================================================
+   RUBY UPGRADES
+===================================================== */
+
+function getRubyCost(type){
+
+  const lv=
+    game.rubyUpgrades[type];
+
+  if(type==="power"){
+
+    return 1+lv*2;
+
+  }
+
+  return 2+lv*3;
+
+}
+
+
+function upgradeRuby(type){
+
+  const cost=
+    getRubyCost(type);
+
+  if(game.ruby<cost){
+
+    showToast("💎 ルビーが足りません");
+
+    return;
+
+  }
+
+  game.ruby-=cost;
+
+  game.rubyUpgrades[type]++;
+
+  saveGame();
+
+  renderAll();
+
+  showToast(
+    "💎 永久強化！"
+  );
+
+}
+
+
+/* =====================================================
+   REBIRTH
+===================================================== */
+
+function openRebirth(){
+
+  if(game.floor<100){
+
+    showToast(
+      "100階に到達すると転生できます"
+    );
+
+    return;
+
+  }
+
+  const reward=
+    Math.floor(
+      5+
+      game.floor/20+
+      game.rebirth*2
+    );
+
+  showModal(
+
+    "♻️ 転生しますか？",
+
+    `
+      現在の階層：${game.floor}階<br>
+      転生回数：${game.rebirth}回<br><br>
+
+      <strong style="color:#ff6c9c">
+      💎 ${reward}ルビー獲得
+      </strong>
+      <br><br>
+
+      レベル・コイン・装備・階層はリセットされます。
+    `,
+
+    [
+
+      {
+        text:"やめる",
+        cls:"smallButton gray",
+        action:closeModal
+      },
+
+      {
+        text:"♻️ 転生する",
+        cls:"smallButton",
+        action:()=>rebirth(reward)
+      }
+
+    ]
+
+  );
+
+}
+
+
+function rebirth(reward){
+
+  game.ruby+=reward;
+  game.rebirth++;
+
+  game.floor=1;
+  game.level=1;
+  game.xp=0;
+  game.xpNext=100;
+
+  game.gold=500;
+
+  game.upgrades={
+    attack:0,
+    hp:0,
+    defense:0,
+    crit:0,
+    gold:0
+  };
+
+  game.inventory=[];
+  game.equipped={
+    weapon:null,
+    armor:null,
+    ring:null
+  };
+
+  game.hp=100;
+
+  saveGame();
+
+  closeModal();
+
+  createEnemy();
+  renderAll();
+
+  showToast(
+    "♻️ 転生完了！ 💎 +"+reward
+  );
+
+}
+
+
+/* =====================================================
+   GACHA
+===================================================== */
+
+function gacha(){
+
+  const cost=500;
+
+  if(game.gold<cost){
+
+    showToast("🪙 コインが足りません");
+
+    return;
+
+  }
+
+  game.gold-=cost;
+
+  const item=createItem();
+
+  game.inventory.unshift(item);
+
+  if(game.inventory.length>20){
+    game.inventory.pop();
+  }
+
+  saveGame();
+
+  renderAll();
+
+  showModal(
+
+    "🎰 GACHA",
+
+    `
+      ${item.icon}<br>
+      <strong>${item.name}</strong>
+      <br><br>
+      攻撃：+${item.attack}<br>
+      防御：+${item.defense}<br>
+      HP：+${item.hp}<br>
+      クリティカル：+${item.crit}%
+    `,
+
+    [
+      {
+        text:"閉じる",
+        cls:"smallButton",
+        action:closeModal
+      }
+    ]
+
+  );
+
+}
+
+
+/* =====================================================
+   MISSIONS
+===================================================== */
+
+function renderMissions(){
+
+  const el=
+    document.getElementById("missions");
+
+  const missions=[
+
+    {
+      name:"敵を10体倒す",
+      value:game.missions.kills,
+      max:10,
+      reward:"💎 1"
+    },
+
+    {
+      name:"敵を50体倒す",
+      value:game.missions.kills,
+      max:50,
+      reward:"💎 3"
+    },
+
+    {
+      name:"コインを1000枚獲得",
+      value:game.missions.gold,
+      max:1000,
+      reward:"🪙 500"
+    },
+
+    {
+      name:"ボスを5体倒す",
+      value:game.missions.boss,
+      max:5,
+      reward:"💎 5"
+    }
+
+  ];
+
+  el.innerHTML="";
+
+  for(const m of missions){
+
+    const percent=
+      Math.min(
+        100,
+        m.value/m.max*100
+      );
+
+    el.innerHTML+=`
+
+      <div class="mission">
+
+        <div class="missionTop">
+          <span>${m.name}</span>
+          <span>
+            ${Math.min(m.value,m.max)}/${m.max}
+          </span>
+        </div>
+
+        <div class="missionProgress">
+          <div
+            class="missionFill"
+            style="width:${percent}%">
+          </div>
+        </div>
+
+        <div class="muted" style="margin-top:5px">
+          報酬：${m.reward}
+        </div>
+
+      </div>
+
+    `;
+
+  }
+
+}
+
+
+/* =====================================================
+   RANKING
+===================================================== */
+
+function renderRanking(){
+
+  const rankings=[
+
+    ["🥇","DARK KING",Math.max(game.bestFloor+40,240)],
+    ["🥈","Shadow",Math.max(game.bestFloor+20,180)],
+    ["🥉","Nightmare",Math.max(game.bestFloor+10,130)],
+    ["4","VOID",Math.max(game.bestFloor+5,110)],
+    ["5","DARK HERO",game.bestFloor]
+
+  ];
+
+  const el=
+    document.getElementById("ranking");
+
+  el.innerHTML="";
+
+  rankings.sort(
+    (a,b)=>b[2]-a[2]
+  );
+
+  rankings.forEach((r,i)=>{
+
+    el.innerHTML+=`
+
+      <div class="rankRow">
+
+        <div class="rankNumber">
+          ${i<3?r[0]:i+1}
+        </div>
+
+        <div class="rankName">
+          ${r[1]}
+        </div>
+
+        <div class="rankFloor">
+          ${r[2]}階
+        </div>
+
+      </div>
+
+    `;
+
+  });
+
+}
+
+
+/* =====================================================
+   AUTO
+===================================================== */
+
+function toggleAuto(){
+
+  game.auto=!game.auto;
+
+  updateAuto();
+
+  if(game.auto){
+
+    autoTimer=setInterval(()=>{
+
+      if(
+        document.getElementById(
+          "battleScreen"
+        ).classList.contains("active")
+      ){
+
+        attack();
+
+      }
+
+    },260);
+
+    showToast("🤖 AUTO ON");
+
+  }else{
+
+    clearInterval(autoTimer);
+
+    showToast("🤖 AUTO OFF");
+
+  }
+
+  saveGame();
+
+}
+
+
+function updateAuto(){
+
+  const btn=
+    document.getElementById("autoButton");
+
+  const text=
+    document.getElementById("autoText");
+
+  btn.classList.toggle(
+    "on",
+    game.auto
+  );
+
+  text.textContent=
+    game.auto
+      ? "ON"
+      : "OFF";
+
+}
+
+
+/* =====================================================
+   UI
+===================================================== */
+
+function updateBattleUI(){
+
+  document.getElementById("floor")
+    .textContent=game.floor;
+
+  document.getElementById("level")
+    .textContent=game.level;
+
+  document.getElementById("gold")
+    .textContent=Math.floor(game.gold);
+
+  document.getElementById("ruby")
+    .textContent=Math.floor(game.ruby);
+
+  document.getElementById("enemyName")
+    .textContent=enemy.name;
+
+  const hpPercent=
+    enemy.maxHp
+      ? enemy.hp/enemy.maxHp*100
+      : 0;
+
+  document.getElementById("enemyHpFill")
+    .style.width=
+      Math.max(0,hpPercent)+"%";
+
+  document.getElementById("enemyHpText")
+    .textContent=
+      Math.floor(enemy.hp)+
+      " / "+
+      Math.floor(enemy.maxHp);
+
+  const maxHp=
+    getMaxHp();
+
+  game.hp=
+    Math.min(
+      game.hp,
+      maxHp
+    );
+
+  document.getElementById("hpFill")
+    .style.width=
+      game.hp/maxHp*100+"%";
+
+  document.getElementById("hpText")
+    .textContent=
+      Math.floor(game.hp)+
+      " / "+
+      maxHp;
+
+  document.getElementById("xpFill")
+    .style.width=
+      game.xp/game.xpNext*100+"%";
+
+  document.getElementById("xpText")
+    .textContent=
+      game.xp+
+      " / "+
+      game.xpNext;
+
+  document.getElementById("attackValue")
+    .textContent=getAttack();
+
+  document.getElementById("defenseValue")
+    .textContent=getDefense();
+
+  document.getElementById("critValue")
+    .textContent=
+      getCrit().toFixed(1)+"%";
+
+  document.getElementById("bestFloor")
+    .textContent=
+      game.bestFloor+"階";
+
+}
+
+
+function renderEnhance(){
+
+  document.getElementById("atkLv")
+    .textContent=game.upgrades.attack;
+
+  document.getElementById("hpLv")
+    .textContent=game.upgrades.hp;
+
+  document.getElementById("defLv")
+    .textContent=game.upgrades.defense;
+
+  document.getElementById("critLv")
+    .textContent=game.upgrades.crit;
+
+  document.getElementById("goldLv")
+    .textContent=game.upgrades.gold;
+
+  document.getElementById("atkCost")
+    .textContent=getUpgradeCost("attack");
+
+  document.getElementById("hpCost")
+    .textContent=getUpgradeCost("hp");
+
+  document.getElementById("defCost")
+    .textContent=getUpgradeCost("defense");
+
+  document.getElementById("critCost")
+    .textContent=getUpgradeCost("crit");
+
+  document.getElementById("goldCost")
+    .textContent=getUpgradeCost("gold");
+
+}
+
+
+function renderRebirth(){
+
+  document.getElementById("rebirthCount")
+    .textContent=game.rebirth;
+
+  document.getElementById("rebirthFloor")
+    .textContent=game.bestFloor+"階";
+
+  const reward=
+    game.floor>=100
+      ? Math.floor(
+          5+
+          game.floor/20+
+          game.rebirth*2
+        )
+      : 0;
+
+  document.getElementById("rebirthReward")
+    .textContent="💎 "+reward;
+
+  const button=
+    document.getElementById("rebirthButton");
+
+  if(game.floor>=100){
+
+    button.disabled=false;
+    button.style.opacity="1";
+    button.textContent="♻️ 転生する";
+
+  }else{
+
+    button.disabled=true;
+    button.style.opacity=".45";
+    button.textContent=
+      "🔒 100階到達で解放";
+
+  }
+
+  document.getElementById("rubyPowerLv")
+    .textContent=game.rubyUpgrades.power;
+
+  document.getElementById("rubyGoldLv")
+    .textContent=game.rubyUpgrades.gold;
+
+  document.getElementById("rubyPowerCost")
+    .textContent=getRubyCost("power");
+
+  document.getElementById("rubyGoldCost")
+    .textContent=getRubyCost("gold");
+
+}
+
+
+function renderAll(){
+
+  updateBattleUI();
+  renderInventory();
+  renderEnhance();
+  renderRebirth();
+  renderRanking();
+  renderMissions();
+  updateAuto();
+
+}
+
+
+/* =====================================================
+   NAVIGATION
+===================================================== */
+
+document.querySelectorAll(".navButton")
+.forEach(button=>{
+
+  button.addEventListener("click",()=>{
+
+    const target=
+      button.dataset.screen;
+
+    document.querySelectorAll(".screen")
+    .forEach(screen=>{
+      screen.classList.remove("active");
+    });
+
+    document.getElementById(target)
+      .classList.add("active");
+
+    document.querySelectorAll(".navButton")
+    .forEach(btn=>{
+      btn.classList.remove("active");
+    });
+
+    button.classList.add("active");
+
+    renderAll();
+
+  });
+
+});
+
+
+/* =====================================================
+   MODAL
+===================================================== */
+
+function showModal(title,text,buttons){
+
+  document.getElementById("modalTitle")
+    .textContent=title;
+
+  document.getElementById("modalText")
+    .innerHTML=text;
+
+  const area=
+    document.getElementById(
+      "modalButtons"
+    );
+
+  area.innerHTML="";
+
+  buttons.forEach(b=>{
+
+    const btn=
+      document.createElement("button");
+
+    btn.className=
+      b.cls||"smallButton";
+
+    btn.textContent=b.text;
+
+    btn.style.margin="4px";
+
+    btn.onclick=b.action;
+
+    area.appendChild(btn);
+
+  });
+
+  document.getElementById("modal")
+    .classList.add("show");
+
+}
+
+
+function closeModal(){
+
+  document.getElementById("modal")
+    .classList.remove("show");
+
+}
+
+
+/* =====================================================
+   TOAST
+===================================================== */
+
+let toastTimer;
+
+function showToast(text){
+
+  const toast=
+    document.getElementById("toast");
+
+  toast.textContent=text;
+
+  toast.classList.add("show");
+
+  clearTimeout(toastTimer);
+
+  toastTimer=setTimeout(()=>{
+
+    toast.classList.remove("show");
+
+  },1500);
+
+}
+
+
+function showLoot(text){
+
+  const loot=
+    document.getElementById("loot");
+
+  loot.innerHTML=text;
+
+  loot.classList.remove("show");
+
+  void loot.offsetWidth;
+
+  loot.classList.add("show");
+
+}
+
+
+/* =====================================================
+   TOUCH SUPPORT
+===================================================== */
+
+document
+.getElementById("attackButton")
+.addEventListener(
+  "pointerdown",
+  e=>{
+    e.preventDefault();
+    attack();
+  }
+);
+
+
+/* =====================================================
+   INITIALIZE
+===================================================== */
+
+function initializeGame(){
+
+  loadGame();
+
+  game.hp=
+    Math.min(
+      game.hp,
+      getMaxHp()
+    );
+
+  createEnemy();
+
+  renderAll();
+
+  if(game.auto){
+
+    autoTimer=setInterval(()=>{
+      attack();
+    },260);
+
+  }
+
+}
+
+
+/* =====================================================
+   AUTO SAVE
+===================================================== */
+
+setInterval(()=>{
+
+  saveGame();
+
+},5000);
+
+
+/* =====================================================
+   START
+===================================================== */
+
+initializeGame();
+
+</script>
+
+<!-- DARK LOOT V2.5 UI + BATTLE FIX PATCH -->
+<style>
+:root{
+  --dl-gold:#d6b56b;
+  --dl-gold2:#8e6b35;
+  --dl-ink:#0b0807;
+  --dl-panel:#17100d;
+  --dl-panel2:#241711;
+  --dl-red:#9f2630;
+  --dl-purple:#6841a0;
+}
+
+html,body{
+  background:#070504!important;
+}
+
+#app{
+  background:
+    radial-gradient(ellipse at 50% 35%,rgba(105,56,29,.22),transparent 42%),
+    radial-gradient(ellipse at 20% 80%,rgba(80,25,18,.18),transparent 38%),
+    linear-gradient(180deg,#090706 0%,#120c09 48%,#050403 100%)!important;
+}
+
+#app:before{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  z-index:1;
+  opacity:.22;
+
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      rgba(255,255,255,.025) 0 1px,
+      transparent 1px 4px
+    ),
+    radial-gradient(
+      circle at 30% 30%,
+      rgba(255,220,160,.05),
+      transparent 22%
+    ),
+    radial-gradient(
+      circle at 70% 70%,
+      rgba(0,0,0,.4),
+      transparent 35%
+    );
+
+  mix-blend-mode:screen;
+}
+
+/* =========================
+   TOP BAR
+========================= */
+
+.topbar{
+  background:
+    linear-gradient(
+      180deg,
+      #1b120e,
+      #0a0705
+    )!important;
+
+  border-bottom:
+    1px solid rgba(214,181,107,.45)!important;
+
+  box-shadow:
+    0 3px 18px rgba(0,0,0,.65),
+    inset 0 -1px rgba(255,255,255,.06);
+}
+
+.logo{
+  color:#ead8a6!important;
+  text-shadow:0 2px 10px #000;
+  letter-spacing:5px!important;
+}
+
+.logoSub{
+  color:#927c55!important;
+}
+
+.currency{
+  border-radius:5px!important;
+
+  background:
+    linear-gradient(
+      180deg,
+      #251b15,
+      #100b08
+    )!important;
+
+  border:
+    1px solid rgba(214,181,107,.45)!important;
+
+  box-shadow:
+    inset 0 0 0 1px rgba(0,0,0,.7),
+    0 2px 8px #000;
+}
+
+.main{
+  background:transparent!important;
+  z-index:2;
+}
+
+.screen{
+  padding:8px 9px 25px!important;
+}
+
+/* =========================
+   PANELS
+========================= */
+
+.card,
+.playerPanel,
+.item,
+.equipSlot,
+.upgrade,
+.statCard{
+
+  border-radius:4px!important;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(38,24,18,.96),
+      rgba(13,9,7,.96)
+    )!important;
+
+  border:
+    1px solid rgba(177,143,83,.42)!important;
+
+  box-shadow:
+    inset 0 0 0 1px rgba(0,0,0,.75),
+    0 10px 28px rgba(0,0,0,.5)!important;
+}
+
+.card,
+.modalBox,
+.stage{
+  position:relative;
+}
+
+.card:before,
+.modalBox:before,
+.stage:before{
+
+  content:"";
+
+  position:absolute;
+  inset:5px;
+
+  pointer-events:none;
+
+  border:
+    1px solid rgba(214,181,107,.18);
+
+  box-shadow:
+    inset 0 0 18px rgba(214,181,107,.06);
+}
+
+.title{
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif!important;
+
+  color:#e4d2a3!important;
+
+  text-shadow:
+    0 2px 8px #000;
+
+  letter-spacing:2px;
+}
+
+.subtitle,
+.sectionTitle{
+  color:#9f8a62!important;
+}
+
+/* =========================
+   BUTTONS
+========================= */
+
+.bigButton,
+.attackButton{
+
+  border-radius:5px!important;
+
+  background:
+    linear-gradient(
+      180deg,
+      #7d2b30,
+      #471318
+    )!important;
+
+  border:
+    1px solid #b97862!important;
+
+  box-shadow:
+    inset 0 1px rgba(255,255,255,.15),
+    0 5px 15px rgba(0,0,0,.55)!important;
+}
+
+.smallButton{
+
+  border-radius:4px!important;
+
+  background:
+    linear-gradient(
+      180deg,
+      #6b522e,
+      #332313
+    )!important;
+
+  border:
+    1px solid #a98a50!important;
+}
+
+.smallButton.gray{
+  background:
+    linear-gradient(
+      180deg,
+      #3d3932,
+      #1d1a16
+    )!important;
+}
+
+.smallButton.red{
+  background:
+    linear-gradient(
+      180deg,
+      #79272d,
+      #3b0f14
+    )!important;
+}
+
+.smallButton.green{
+  background:
+    linear-gradient(
+      180deg,
+      #2e7056,
+      #123b2b
+    )!important;
+}
+
+/* =========================
+   BOTTOM NAV
+========================= */
+
+.bottomNav{
+
+  background:
+    linear-gradient(
+      180deg,
+      #1b120e,
+      #090706
+    )!important;
+
+  border-top:
+    1px solid rgba(214,181,107,.42)!important;
+}
+
+.navButton.active{
+  color:#e3c47b!important;
+
+  text-shadow:
+    0 0 8px rgba(214,181,107,.35);
+}
+
+.navButton{
+  color:#766951!important;
+}
+
+/* =========================
+   BATTLE STAGE
+========================= */
+
+.stage{
+
+  border-radius:5px!important;
+
+  background:
+
+    radial-gradient(
+      ellipse at 50% 72%,
+      rgba(119,55,27,.28),
+      transparent 30%
+    ),
+
+    radial-gradient(
+      ellipse at 50% 18%,
+      rgba(100,80,45,.12),
+      transparent 38%
+    ),
+
+    linear-gradient(
+      180deg,
+      #211610 0%,
+      #120b08 56%,
+      #070504 100%
+    )!important;
+
+  border:
+    1px solid rgba(214,181,107,.62)!important;
+
+  box-shadow:
+
+    inset 0 0 0 2px #080604,
+
+    inset 0 0 50px rgba(0,0,0,.85),
+
+    0 18px 40px rgba(0,0,0,.7)!important;
+}
+
+.stage:after{
+
+  content:"✦";
+
+  position:absolute;
+
+  left:7px;
+  top:4px;
+
+  color:#c5a363;
+
+  font-size:20px;
+
+  opacity:.75;
+
+  text-shadow:
+    0 0 8px #000;
+
+  pointer-events:none;
+}
+
+.floorLabel{
+  color:#a78d5e!important;
+  letter-spacing:3px!important;
+}
+
+.floorNumber{
+  color:#e6c879!important;
+
+  text-shadow:
+    0 2px 5px #000;
+}
+
+.bossLabel{
+  color:#e05b5b!important;
+
+  text-shadow:
+    0 0 10px rgba(255,40,40,.45);
+}
+
+.arena{
+  background:
+    radial-gradient(
+      ellipse,
+      rgba(166,94,45,.26),
+      transparent 68%
+    )!important;
+}
+
+/* =========================
+   ENEMY
+========================= */
+
+.enemyCore{
+
+  width:96px!important;
+  height:108px!important;
+
+  border-radius:
+    42% 42% 34% 34%!important;
+
+  background:
+    linear-gradient(
+      145deg,
+      #8a8173 0%,
+      #3b3530 38%,
+      #171311 100%
+    )!important;
+
+  border:
+    2px solid #8c7650;
+
+  box-shadow:
+
+    0 18px 35px #000,
+
+    0 0 30px rgba(166,95,44,.2),
+
+    inset 0 2px rgba(255,255,255,.18)!important;
+}
+
+.enemyCore:before,
+.enemyCore:after{
+
+  background:#ffcf77!important;
+
+  box-shadow:
+    0 0 12px rgba(255,160,50,.8)!important;
+}
+
+.enemyMouth{
+  background:#090605!important;
+  border:1px solid #4f3324;
+}
+
+.enemyName{
+  color:#e2cfaa!important;
+
+  text-shadow:
+    0 2px 4px #000;
+}
+
+.enemyHpBar{
+
+  height:11px!important;
+
+  border:
+    1px solid #513326;
+
+  background:#090706!important;
+}
+
+.enemyHpFill{
+  background:
+    linear-gradient(
+      90deg,
+      #8d2026,
+      #d35b3c
+    )!important;
+}
+
+.enemyHpText{
+  color:#ad9876!important;
+}
+
+/* =========================
+   PLAYER
+========================= */
+
+.playerPanel{
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(35,22,16,.96),
+      rgba(12,8,6,.96)
+    )!important;
+}
+
+.playerName{
+  color:#e4d4b0!important;
+}
+
+.playerLevel{
+  color:#d7b86d!important;
+}
+
+.bar{
+
+  background:#0b0806!important;
+
+  border:
+    1px solid #4d3625;
+}
+
+.hpFill{
+  background:
+    linear-gradient(
+      90deg,
+      #8f1d29,
+      #d64b3e
+    )!important;
+}
+
+.xpFill{
+  background:
+    linear-gradient(
+      90deg,
+      #7350a1,
+      #b28bca
+    )!important;
+}
+
+/* =========================
+   AUTO BUTTON
+========================= */
+
+.attackArea{
+  grid-template-columns:
+    1fr 92px!important;
+}
+
+.autoButton{
+
+  height:54px;
+
+  border-radius:5px!important;
+
+  background:
+    linear-gradient(
+      180deg,
+      #3b3024,
+      #1b140f
+    )!important;
+
+  border:
+    1px solid #a98a50!important;
+
+  color:#d8c393!important;
+}
+
+.autoButton.on{
+
+  background:
+    linear-gradient(
+      180deg,
+      #34715a,
+      #173b2d
+    )!important;
+
+  border-color:#8bc8a8!important;
+
+  box-shadow:
+    0 0 18px rgba(60,200,140,.18)!important;
+}
+
+/* =========================
+   ORIGINAL ADVENTURER ART
+========================= */
+
+.dlHeroArt{
+
+  position:absolute;
+
+  left:50%;
+  bottom:18px;
+
+  transform:
+    translateX(-50%);
+
+  width:92px;
+  height:112px;
+
+  z-index:4;
+
+  pointer-events:none;
+
+  opacity:.9;
+
+  filter:
+    drop-shadow(0 12px 8px #000);
+}
+
+.dlHeroArt .head{
+
+  position:absolute;
+
+  left:31px;
+  top:4px;
+
+  width:30px;
+  height:32px;
+
+  border-radius:
+    45% 45% 35% 35%;
+
+  background:
+    linear-gradient(
+      145deg,
+      #b8b0a2,
+      #49443e
+    );
+
+  border:
+    2px solid #8b7654;
+}
+
+.dlHeroArt .body{
+
+  position:absolute;
+
+  left:22px;
+  top:32px;
+
+  width:48px;
+  height:52px;
+
+  border-radius:
+    18px 18px 10px 10px;
+
+  background:
+    linear-gradient(
+      145deg,
+      #817a70,
+      #25211e
+    );
+
+  border:
+    2px solid #8b7654;
+}
+
+.dlHeroArt .cape{
+
+  position:absolute;
+
+  left:45px;
+  top:34px;
+
+  width:42px;
+  height:70px;
+
+  background:
+    linear-gradient(
+      150deg,
+      #35251d,
+      #0c0806
+    );
+
+  clip-path:
+    polygon(
+      0 0,
+      100% 10%,
+      75% 100%,
+      25% 85%
+    );
+
+  border-right:
+    2px solid #765d3e;
+}
+
+.dlHeroArt .sword{
+
+  position:absolute;
+
+  left:4px;
+  top:18px;
+
+  width:7px;
+  height:96px;
+
+  background:
+    linear-gradient(
+      90deg,
+      #ddd,
+      #625b52
+    );
+
+  transform:
+    rotate(16deg);
+
+  transform-origin:
+    bottom;
+
+  border:
+    1px solid #211c18;
+
+  box-shadow:
+    0 0 5px rgba(255,255,255,.25);
+}
+
+.dlHeroArt .guard{
+
+  position:absolute;
+
+  left:-3px;
+  top:62px;
+
+  width:25px;
+  height:6px;
+
+  background:#c29a54;
+
+  transform:
+    rotate(16deg);
+}
+
+.dlHeroArt .shield{
+
+  position:absolute;
+
+  right:-4px;
+  top:55px;
+
+  width:29px;
+  height:38px;
+
+  border-radius:
+    45% 45% 50% 50%;
+
+  background:
+    linear-gradient(
+      145deg,
+      #6b6257,
+      #211c18
+    );
+
+  border:
+    2px solid #9c7d4e;
+
+  transform:
+    rotate(-8deg);
+}
+
+/* =========================
+   DEFEAT SCREEN
+========================= */
+
+.dlDefeatModal{
+
+  position:absolute;
+
+  inset:0;
+
+  z-index:100;
+
+  display:none;
+
+  align-items:center;
+  justify-content:center;
+
+  padding:20px;
+
+  background:
+    rgba(0,0,0,.78);
+
+  backdrop-filter:
+    blur(5px);
+}
+
+.dlDefeatModal.show{
+  display:flex;
+}
+
+.dlDefeatBox{
+
+  width:
+    min(330px,92vw);
+
+  padding:
+    24px 18px;
+
+  text-align:center;
+
+  background:
+    linear-gradient(
+      180deg,
+      #291812,
+      #0c0806
+    );
+
+  border:
+    1px solid #b08b4f;
+
+  box-shadow:
+    0 20px 70px #000,
+    inset 0 0 0 2px #0a0705;
+
+  border-radius:5px;
+}
+
+.dlDefeatBox h2{
+
+  margin:
+    0 0 8px;
+
+  color:#d86b5f;
+
+  font-family:
+    Georgia,
+    serif;
+
+  letter-spacing:3px;
+}
+
+.dlDefeatBox p{
+
+  margin:
+    0 0 16px;
+
+  color:#bba889;
+
+  font-size:12px;
+
+  line-height:1.7;
+}
+
+.dlRestart{
+
+  width:100%;
+  height:48px;
+
+  border-radius:5px;
+
+  background:
+    linear-gradient(
+      180deg,
+      #7b2e32,
+      #421419
+    );
+
+  border:
+    1px solid #c58a72;
+
+  color:#f1d7ad;
+
+  font-weight:900;
+}
+
+/* Enemy damage to player */
+
+.dlPlayerDamage{
+
+  position:absolute;
+
+  left:50%;
+  top:70%;
+
+  transform:
+    translate(-50%,-50%);
+
+  z-index:25;
+
+  color:#ff7d6e;
+
+  font-weight:1000;
+
+  font-size:20px;
+
+  text-shadow:
+    0 0 10px #000;
+
+  animation:
+    dlPlayerDmg .55s forwards;
+
+  pointer-events:none;
+}
+
+@keyframes dlPlayerDmg{
+
+  0%{
+    opacity:1;
+    transform:
+      translate(-50%,0)
+      scale(.8);
+  }
+
+  100%{
+    opacity:0;
+    transform:
+      translate(-50%,-55px)
+      scale(1.1);
+  }
+}
+
+@media(max-height:680px){
+
+  .stage{
+    min-height:230px!important;
+  }
+
+  .enemyVisual{
+    height:105px!important;
+  }
+
+  .dlHeroArt{
+    transform:
+      translateX(-50%)
+      scale(.82);
+
+    transform-origin:
+      bottom;
+  }
+
+  .playerPanel{
+    padding:7px!important;
+  }
+}
+</style>
+
+
+<script>
+
+/* =====================================================
+   DARK LOOT V2.5 GAMEPLAY PATCH
+===================================================== */
+
+(function(){
+
+  function initPatch(){
+
+    const autoBtn =
+      document.getElementById("autoButton");
+
+    const attackBtn =
+      document.getElementById("attackButton");
+
+    const stage =
+      document.querySelector(".stage");
+
+    if(
+      !autoBtn ||
+      !attackBtn ||
+      !stage
+    ){
+      return;
+    }
+
+
+    /* =====================================
+       AUTO TOUCH FIX
+    ===================================== */
+
+    if(!autoBtn.dataset.dlBound){
+
+      autoBtn.dataset.dlBound="1";
+
+      autoBtn.addEventListener(
+        "pointerdown",
+        function(e){
+
+          e.preventDefault();
+          e.stopPropagation();
+
+          if(
+            typeof toggleAuto === "function"
+          ){
+
+            toggleAuto();
+
+          }
+
+        },
+        {
+          passive:false
+        }
+      );
+
+    }
+
+
+    /* =====================================
+       ADVENTURER
+    ===================================== */
+
+    if(
+      !stage.querySelector(".dlHeroArt")
+    ){
+
+      const hero =
+        document.createElement("div");
+
+      hero.className="dlHeroArt";
+
+      hero.innerHTML=`
+
+        <div class="cape"></div>
+
+        <div class="head"></div>
+
+        <div class="body"></div>
+
+        <div class="sword"></div>
+
+        <div class="guard"></div>
+
+        <div class="shield"></div>
+
+      `;
+
+      stage.appendChild(hero);
+
+    }
+
+
+    /* =====================================
+       DEFEAT MODAL
+    ===================================== */
+
+    if(
+      !document.getElementById(
+        "dlDefeatModal"
+      )
+    ){
+
+      const modal =
+        document.createElement("div");
+
+      modal.id="dlDefeatModal";
+
+      modal.className=
+        "dlDefeatModal";
+
+      modal.innerHTML=`
+
+        <div class="dlDefeatBox">
+
+          <h2>
+            YOU DIED
+          </h2>
+
+          <p>
+
+            力尽きてしまった……<br>
+
+            この階層から
+            もう一度挑戦できます。
+
+          </p>
+
+          <button
+            class="dlRestart"
+            id="dlRestartBtn"
+          >
+            ⚔ 再戦する
+          </button>
+
+        </div>
+
+      `;
+
+      document
+        .getElementById("app")
+        .appendChild(modal);
+
+
+      document
+        .getElementById("dlRestartBtn")
+        .addEventListener(
+          "pointerdown",
+          function(e){
+
+            e.preventDefault();
+            e.stopPropagation();
+
+            restartBattle();
+
+          },
+          {
+            passive:false
+          }
+        );
+
+    }
+
+
+    /* =====================================
+       ENEMY AI
+    ===================================== */
+
+    if(
+      !window.__dlEnemyTimer
+    ){
+
+      window.__dlEnemyTimer =
+        setInterval(
+          enemyTurn,
+          1450
+        );
+
+    }
+
+
+    /* =====================================
+       AUTO STATE
+    ===================================== */
+
+    if(
+      typeof updateAuto === "function"
+    ){
+
+      updateAuto();
+
+    }
+
+  }
+
+
+  /* =====================================
+     ENEMY ATTACK
+  ===================================== */
+
+  function enemyTurn(){
+
+    try{
+
+      const battle =
+        document.getElementById(
+          "battleScreen"
+        );
+
+      if(
+        !battle ||
+        !battle.classList.contains(
+          "active"
+        )
+      ){
+
+        return;
+
+      }
+
+
+      if(
+        typeof enemy === "undefined" ||
+        enemy.defeated
+      ){
+
+        return;
+
+      }
+
+
+      if(
+        typeof game === "undefined"
+      ){
+
+        return;
+
+      }
+
+
+      if(
+        game.hp <= 0
+      ){
+
+        return;
+
+      }
+
+
+      const base =
+
+        16 +
+
+        Math.floor(
+          game.floor * 2.4
+        );
+
+
+      const bossBonus =
+        enemy.boss
+          ? 2.4
+          : 1;
+
+
+      const defense =
+
+        typeof getDefense === "function"
+
+          ? getDefense()
+
+          : 0;
+
+
+      let damage =
+
+        Math.floor(
+          base *
+          bossBonus -
+
+          defense *
+          .55
+        );
+
+
+      damage =
+        Math.max(
+          1,
+          damage
+        );
+
+
+      game.hp =
+        Math.max(
+          0,
+          game.hp - damage
+        );
+
+
+      showPlayerDamage(
+        damage
+      );
+
+
+      updateBattleUI();
+
+
+      if(
+        typeof saveGame === "function"
+      ){
+
+        saveGame();
+
+      }
+
+
+      if(
+        game.hp <= 0
+      ){
+
+        playerDefeated();
+
+      }
+
+    }
+
+    catch(err){
+
+      console.warn(
+        "DARK LOOT enemyTurn:",
+        err
+      );
+
+    }
+
+  }
+
+
+  /* =====================================
+     PLAYER DAMAGE
+  ===================================== */
+
+  function showPlayerDamage(
+    value
+  ){
+
+    const stage =
+      document.querySelector(
+        ".stage"
+      );
+
+    if(!stage)return;
+
+
+    const d =
+      document.createElement(
+        "div"
+      );
+
+    d.className=
+      "dlPlayerDamage";
+
+    d.textContent=
+      "-" + value;
+
+    stage.appendChild(d);
+
+
+    setTimeout(
+      function(){
+
+        d.remove();
+
+      },
+      600
+    );
+
+  }
+
+
+  /* =====================================
+     PLAYER DEFEATED
+  ===================================== */
+
+  function playerDefeated(){
+
+    try{
+
+      game.hp=0;
+
+      game.auto=false;
+
+
+      if(
+        typeof updateAuto === "function"
+      ){
+
+        updateAuto();
+
+      }
+
+
+      if(
+        typeof autoTimer !== "undefined" &&
+        autoTimer
+      ){
+
+        clearInterval(
+          autoTimer
+        );
+
+        autoTimer=null;
+
+      }
+
+
+      if(
+        typeof saveGame === "function"
+      ){
+
+        saveGame();
+
+      }
+
+
+      document
+        .getElementById(
+          "dlDefeatModal"
+        )
+        .classList
+        .add("show");
+
+    }
+
+    catch(err){
+
+      console.warn(
+        "DARK LOOT defeat:",
+        err
+      );
+
+    }
+
+  }
+
+
+  /* =====================================
+     RESTART
+  ===================================== */
+
+  window.restartBattle =
+    function(){
+
+      try{
+
+        const max =
+
+          typeof getMaxHp === "function"
+
+            ? getMaxHp()
+
+            : 100;
+
+
+        game.hp=max;
+
+        game.auto=false;
+
+
+        if(
+          typeof updateAuto === "function"
+        ){
+
+          updateAuto();
+
+        }
+
+
+        if(
+          typeof autoTimer !== "undefined" &&
+          autoTimer
+        ){
+
+          clearInterval(
+            autoTimer
+          );
+
+          autoTimer=null;
+
+        }
+
+
+        if(
+          typeof createEnemy === "function"
+        ){
+
+          createEnemy();
+
+        }
+
+
+        document
+          .getElementById(
+            "dlDefeatModal"
+          )
+          .classList
+          .remove("show");
+
+
+        if(
+          typeof updateBattleUI === "function"
+        ){
+
+          updateBattleUI();
+
+        }
+
+
+        if(
+          typeof saveGame === "function"
+        ){
+
+          saveGame();
+
+        }
+
+      }
+
+      catch(err){
+
+        console.warn(
+          "DARK LOOT restart:",
+          err
+        );
+
+      }
+
+    };
+
+
+  /* =====================================
+     START
+  ===================================== */
+
+  if(
+    document.readyState === "loading"
+  ){
+
+    document.addEventListener(
+      "DOMContentLoaded",
+      initPatch
+    );
+
+  }else{
+
+    setTimeout(
+      initPatch,
+      0
+    );
+
+  }
+
+})();
+
+</script>
+
+</body>
+</html>
